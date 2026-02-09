@@ -1,3 +1,4 @@
+```mermaid
 classDiagram
     direction TB
     
@@ -82,3 +83,4 @@ classDiagram
     User --> Review : writes
     Place --> Review : has
     Place o-- Amenity : includes
+	```
