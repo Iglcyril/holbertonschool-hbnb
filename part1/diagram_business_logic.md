@@ -9,8 +9,7 @@ classDiagram
         -datetime created_at
         -datetime updated_at
         
-        +save() void
-        +delete() boolean
+    
         +to_dict() dict
     }
     
@@ -25,9 +24,7 @@ classDiagram
         +create(data) User
         +read(id) User
         +update(id, data) User
-        +validate_email(email) boolean
-        +hash_password(password) string
-        +verify_password(password) boolean
+       
     }
     
     %% Classe Place
@@ -41,7 +38,6 @@ classDiagram
         -list~string~ amenity_ids
         
         +create(data) Place
-        +read(id) Place
         +update(id, data) Place
         +add_amenity(amenity_id) void
         +remove_amenity(amenity_id) void
@@ -57,7 +53,6 @@ classDiagram
         -string comment
         
         +create(data) Review
-        +read(id) Review
         +update(id, data) Review
         +validate_rating(rating) boolean
     }
@@ -68,7 +63,6 @@ classDiagram
         -string description
         
         +create(data) Amenity
-        +read(id) Amenity
         +update(id, data) Amenity
     }
     
