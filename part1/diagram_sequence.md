@@ -26,8 +26,6 @@ Logic->>DB: save place
 DB-->>Logic: ok + place_id
 Logic-->>API: place created
 API-->>User: 201 Created Place
-
-
 ```
 
 ```mermaid
@@ -43,7 +41,6 @@ Logic->>DB: save review
 DB-->>Logic: ok
 Logic-->>API: review saved
 API-->>User: 201 Review Created
-
 ```
 ```mermaid
 sequenceDiagram
@@ -58,5 +55,4 @@ Logic->>DB: query places
 DB-->>Logic: list of places
 Logic-->>API: results
 API-->>User: 200 OK + list
-
 ```
