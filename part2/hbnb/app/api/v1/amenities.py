@@ -56,6 +56,10 @@ class AmenityResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, amenity_id):
         """Update an amenity's information"""
+<<<<<<< HEAD
+=======
+
+>>>>>>> 690bf131f22c184e2d37bdf194486e8858f6a6d0
 
         try:
             updated_amenity = facade.update_amenity(amenity_id, api.payload)
