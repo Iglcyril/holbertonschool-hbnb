@@ -13,7 +13,7 @@ class HBnBFacade:
         self.place_repo = InMemoryRepository()
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
-        print("FACADE INIT")
+        # print("Initialized facade")
     # ===== USER METHODS =====
 
     def create_user(self, user_data):
