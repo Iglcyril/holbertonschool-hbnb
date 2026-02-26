@@ -64,4 +64,4 @@ class AmenityResource(Resource):
         except ValueError as err:
             return {'error': str(err)}, 400
         except Exception as err:
-            return {'error': 'Internal server error'}, 500
+            return {'error': str(err)}, 500

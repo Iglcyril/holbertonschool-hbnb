@@ -162,12 +162,8 @@ class HBnBFacade:
             return None
 
         if 'name' in amenity_data:
-            updated_amenity = Amenity(name=amenity_data['name'])
-            updated_amenity.id = amenity.id
-            updated_amenity.created_at = amenity.created_at
-            updated_amenity.updated_at = datetime.now()
-            self.amenity_repo.update(amenity_id, updated_amenity)
-            return updated_amenity
+            amenity.name = amenity_data['name']
+            amenity.updated_at = datetime.now()
         return amenity
 
 
