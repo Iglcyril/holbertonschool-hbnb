@@ -4,6 +4,9 @@ from app.models.place import Place
 from app.models.review import Review
 from app.persistence.repository import InMemoryRepository
 from app.models.user import User
+from datetime import datetime
+
+
 class HBnBFacade:
     def __init__(self):
         self.user_repo = InMemoryRepository()
@@ -34,10 +37,90 @@ class HBnBFacade:
             if key not in ['id', 'created_at', 'updated_at']:
                 setattr(user, key, value)
         return user
+
     # ===== PLACE METHODS =====
 
     def get_place(self, place_id):
         return self.place_repo.get(place_id)
+    # ===== REVIEW METHODS =====
+
+    def create_review(self, review_data):
+        """Create a new review with validation"""
+        from app.models.review import Review
+
+        user = self.user_repo.get(review_data['user_id'])
+        if not user:
+            raise ValueError("Invalid user_id: User does not exist")
+
+        place = self.place_repo.get(review_data['place_id'])
+        if not place:
+            raise ValueError("Invalid place_id: Place does not exist")
+
+        review = Review(
+            text=review_data['text'],
+            rating=review_data['rating'],
+            place_id=review_data['place_id'],
+            user_id=review_data['user_id']
+        )
+
+        self.review_repo.add(review)
+        return review
+
+    def get_review(self, review_id):
+        """Retrieve a review by ID"""
+        return self.review_repo.get(review_id)
+
+    def get_all_reviews(self):
+        """Retrieve all reviews"""
+        return self.review_repo.get_all()
+
+    def update_review(self, review_id, review_data):
+        """Update a review with validation"""
+        from app.models.review import Review
+        from datetime import datetime
+
+        review = self.review_repo.get(review_id)
+        if not review:
+            return None
+
+        if 'user_id' in review_data:
+            user = self.user_repo.get(review_data['user_id'])
+            if not user:
+                raise ValueError("Invalid user_id: User does not exist")
+
+        if 'place_id' in review_data:
+            place = self.place_repo.get(review_data['place_id'])
+            if not place:
+                raise ValueError("Invalid place_id: Place does not exist")
+
+        updated_review = Review(
+            text=review_data.get('text', review.text),
+            rating=review_data.get('rating', review.rating),
+            place_id=review_data.get('place_id', review.place_id),
+            user_id=review_data.get('user_id', review.user_id)
+        )
+
+        updated_review.id = review.id
+        updated_review.created_at = review.created_at
+        updated_review.updated_at = datetime.now()
+
+        self.review_repo.update(review_id, updated_review)
+
+        return updated_review
+
+    def delete_review(self, review_id):
+        """Delete a review"""
+        review = self.review_repo.get(review_id)
+        if not review:
+            return False
+
+        return self.review_repo.delete(review_id)
+
+    def get_reviews_by_place(self, place_id):
+        """Get all reviews for a specific place"""
+        all_reviews = self.review_repo.get_all()
+        return [
+            review for review in all_reviews if review.place_id == place_id]
 
     def create_place(self, place_data):
         place = Place(**place_data)
@@ -74,6 +157,7 @@ class HBnBFacade:
     def update_amenity(self, amenity_id, amenity_data):
         """Update an amenity"""
         amenity = self.amenity_repo.get(amenity_id)
+
         if not amenity:
             return None
 
@@ -81,9 +165,10 @@ class HBnBFacade:
             updated_amenity = Amenity(name=amenity_data['name'])
             updated_amenity.id = amenity.id
             updated_amenity.created_at = amenity.created_at
-            updated_amenity.save()
+            updated_amenity.updated_at = datetime.now()
             self.amenity_repo.update(amenity_id, updated_amenity)
             return updated_amenity
         return amenity
+
 
 facade = HBnBFacade()

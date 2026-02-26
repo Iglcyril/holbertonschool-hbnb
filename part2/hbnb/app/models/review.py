@@ -1,14 +1,14 @@
 from .BaseModel import BaseModel
 
+
 class Review(BaseModel):
-    
+
     def __init__(self, text, rating, place_id, user_id):
-       
         super().__init__()
 
         if not isinstance(text, str) or not text.strip():
             raise ValueError("Please write a review")
-    
+
         if not isinstance(rating, int):
             raise ValueError("Rating must be an integer.")
         if rating < 1 or rating > 5:
@@ -16,7 +16,7 @@ class Review(BaseModel):
 
         if not isinstance(place_id, str) or not place_id.strip():
             raise ValueError("Place must be a string.")
-    
+
         if not isinstance(user_id, str) or not user_id.strip():
             raise ValueError("User must be an string")
 
