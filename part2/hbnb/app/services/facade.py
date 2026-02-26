@@ -39,6 +39,7 @@ class HBnBFacade:
         return user
 
     # ===== PLACE METHODS =====
+
     def get_place(self, place_id):
         return self.place_repo.get(place_id)
     # ===== REVIEW METHODS =====
@@ -121,7 +122,24 @@ class HBnBFacade:
         return [
             review for review in all_reviews if review.place_id == place_id]
 
+    def create_place(self, place_data):
+        place = Place(**place_data)
+        self.place_repo.add(place)
+        return place
+
+    def get_all_places(self):
+        return self.place_repo.get_all()
+
+    def update_place(self, place_id, place_data):
+        place = self.place_repo.get(place_id)
+        if not place:
+            return None
+        for key, value in place_data.items():
+            if key not in ['id', 'created_at', 'updated_at']:
+                setattr(place, key, value)
+        return place
     # ===== AMENITY METHODS =====
+
     def create_amenity(self, amenity_data):
         """Create a new amenity"""
         amenity = Amenity(name=amenity_data['name'])
