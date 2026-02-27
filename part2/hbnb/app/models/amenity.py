@@ -2,7 +2,14 @@ from .BaseModel import BaseModel
 
 
 class Amenity(BaseModel):
+    """Amenity model for place features"""
+
     def __init__(self, name):
+        """Initialize a new Amenity instance
+        
+        Args:
+            name: Name of the amenity
+        """
         super().__init__()
 
         if not isinstance(name, str):
@@ -17,9 +24,11 @@ class Amenity(BaseModel):
         self.name = name.strip()
 
     def __str__(self):
+        """String representation of the Amenity object"""
         return f"Amenity(id='{self.id}', name='{self.name}')"
 
     def to_dict(self):
+        """Convert Amenity object to dictionary format"""
         return {
             "id": self.id,
             "name": self.name,

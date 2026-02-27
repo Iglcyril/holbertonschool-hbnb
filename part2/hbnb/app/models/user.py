@@ -2,7 +2,16 @@ from .BaseModel import BaseModel
 
 
 class User(BaseModel):
+    """User model for application users"""
+
     def __init__(self, first_name, last_name, email):
+        """Initialize a new User instance
+        
+        Args:
+            first_name: User's first name
+            last_name: User's last name
+            email: User's email address
+        """
         super().__init__()
 
         if not isinstance(first_name, str) or not first_name.strip():
@@ -25,9 +34,11 @@ class User(BaseModel):
         self.email = email.strip().lower()
 
     def __str__(self):
+        """String representation of the User object"""
         return f"[User] ({self.id}) {self.first_name} {self.last_name}"
 
     def to_dict(self):
+        """Convert User object to dictionary format"""
         return {
             "id": self.id,
             "first_name": self.first_name,
