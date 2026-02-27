@@ -1,3 +1,6 @@
+
+<img width="1536" height="1024" alt="ChatGPT Image 27 févr  2026, 14_07_43" src="https://github.com/user-attachments/assets/3fa7a9ff-3746-4303-974b-e6a7986ed0b3" />
+
 ## 🏠 HBnB – Holberton AirBnB Clone Project
 
 HBnB is a full-stack web application inspired by AirBnB, developed as part of the Holberton School curriculum.
