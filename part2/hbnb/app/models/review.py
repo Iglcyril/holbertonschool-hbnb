@@ -1,14 +1,23 @@
 from .BaseModel import BaseModel
 
+
 class Review(BaseModel):
-    
+    """Review model for place ratings and comments"""
+
     def __init__(self, text, rating, place_id, user_id):
-       
+        """Initialize a new Review instance
+
+        Args:
+            text: Review text content
+            rating: Rating value (1-5)
+            place_id: ID of the place being reviewed
+            user_id: ID of the user who wrote the review
+        """
         super().__init__()
 
         if not isinstance(text, str) or not text.strip():
             raise ValueError("Please write a review")
-    
+
         if not isinstance(rating, int):
             raise ValueError("Rating must be an integer.")
         if rating < 1 or rating > 5:
@@ -16,7 +25,7 @@ class Review(BaseModel):
 
         if not isinstance(place_id, str) or not place_id.strip():
             raise ValueError("Place must be a string.")
-    
+
         if not isinstance(user_id, str) or not user_id.strip():
             raise ValueError("User must be an string")
 
@@ -26,6 +35,7 @@ class Review(BaseModel):
         self.user_id = user_id.strip()
 
     def to_dict(self):
+        """Convert Review object to dictionary format"""
         return {
             "id": self.id,
             "text": self.text,

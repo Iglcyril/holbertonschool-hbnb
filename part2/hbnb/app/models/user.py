@@ -1,18 +1,29 @@
 from .BaseModel import BaseModel
+
+
 class User(BaseModel):
+    """User model for application users"""
+
     def __init__(self, first_name, last_name, email):
+        """Initialize a new User instance
+
+        Args:
+            first_name: User's first name
+            last_name: User's last name
+            email: User's email address
+        """
         super().__init__()
 
         if not isinstance(first_name, str) or not first_name.strip():
             raise ValueError("First name must be a string and can't be empty")
         if len(first_name.strip()) > 50:
             raise ValueError("First name : 50 charaters max")
-        
+
         if not isinstance(last_name, str) or not last_name.strip():
             raise ValueError("Last name must be a string and can't be empty")
         if len(last_name.strip()) > 50:
             raise ValueError("Last name : 50 characters max")
-        
+
         if not isinstance(email, str) or not email.strip():
             raise ValueError("Email can't be empty")
         if "@" not in email or "." not in email.split("@")[-1]:
@@ -23,9 +34,11 @@ class User(BaseModel):
         self.email = email.strip().lower()
 
     def __str__(self):
+        """String representation of the User object"""
         return f"[User] ({self.id}) {self.first_name} {self.last_name}"
-    
+
     def to_dict(self):
+        """Convert User object to dictionary format"""
         return {
             "id": self.id,
             "first_name": self.first_name,
