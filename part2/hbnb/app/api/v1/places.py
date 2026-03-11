@@ -108,7 +108,7 @@ class PlaceResource(Resource):
             data = request.get_json()
             updated_place = facade.update_place(place_id, data)
             if not updated_place:
-                return {"message": "Place not found"}, 404
+                return {"error": "Place not found"}, 404
             return {
                 "id": updated_place.id,
                 "title": updated_place.title,
@@ -117,10 +117,14 @@ class PlaceResource(Resource):
                 "latitude": updated_place.latitude,
                 "longitude": updated_place.longitude,
                 "owner_id": updated_place.owner_id,
-                "amenities": [amenity.id for amenity in updated_place.amenities]
+                "amenities": [amenity.id for amenity in updated_place.amenities],
+                "created_at": updated_place.created_at.isoformat(),
+                "updated_at": updated_place.updated_at.isoformat()
             }, 200
+        except (ValueError, TypeError) as e:
+            return {"error": str(e)}, 400
         except Exception as e:
-            return {"message": str(e)}, 400
+            return {"error": "Internal server error"}, 500
 
 
 @api.route('/<place_id>/reviews')
