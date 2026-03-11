@@ -48,7 +48,7 @@ class AmenityResource(Resource):
                 return {'error': 'Amenity not found'}, 404
             return amenity.to_dict(), 200
         except Exception as err:
-            return {'error': 'Internal srever error'}, 500
+            return {'error': 'Internal server error'}, 500
 
     @api.expect(amenity_model)
     @api.response(200, 'Amenity updated successfully')
@@ -61,7 +61,7 @@ class AmenityResource(Resource):
             if not updated_amenity:
                 return {'error': 'Amenity not found'}, 404
             return updated_amenity.to_dict(), 200
-        except ValueError as err:
+        except (ValueError, TypeError) as err:
             return {'error': str(err)}, 400
         except Exception as err:
             return {'error': str(err)}, 500

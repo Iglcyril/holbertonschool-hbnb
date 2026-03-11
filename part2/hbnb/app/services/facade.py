@@ -169,7 +169,22 @@ class HBnBFacade:
         if not amenity:
             return None
 
+        # Validate that amenity_data is not empty
+        if not amenity_data:
+            raise ValueError("No data provided for update")
+
         if 'name' in amenity_data:
-            amenity.name = amenity_data['name']
-            amenity.updated_at = datetime.now()
+            # Validate the new name using Amenity constructor validation
+            # This will raise ValueError/TypeError if invalid
+            try:
+                temp_amenity = Amenity(name=amenity_data['name'])
+                # If validation passed, update the existing amenity
+                amenity.name = temp_amenity.name  # Use the cleaned name (stripped)
+                amenity.updated_at = datetime.now()
+            except (ValueError, TypeError) as e:
+                # Re-raise the validation error to be caught by API layer
+                raise e
+        else:
+            raise ValueError("Name field is required for amenity update")
+        
         return amenity
