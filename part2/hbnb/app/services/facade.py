@@ -163,12 +163,30 @@ class HBnBFacade:
 
     def update_review(self, review_id, review_data):
         """Update a review with validation"""
-        from datetime import datetime
+        from app.models.review import Review
 
         review = self.review_repo.get(review_id)
         if not review:
             return None
 
+        # Validate that review_data is not empty
+        if not review_data:
+            raise ValueError("No data provided for update")
+
+        # Create current data with fallbacks
+        current_data = {
+            'text': review.text,
+            'rating': review.rating,
+            'place_id': review.place_id,
+            'user_id': review.user_id
+        }
+
+        # Update with new data
+        for key, value in review_data.items():
+            if key in ['text', 'rating', 'place_id', 'user_id']:
+                current_data[key] = value
+
+        # Validate user_id and place_id exist if being updated
         if 'user_id' in review_data:
             user = self.user_repo.get(review_data['user_id'])
             if not user:
@@ -179,11 +197,27 @@ class HBnBFacade:
             if not place:
                 raise ValueError("Invalid place_id: Place does not exist")
 
-        self.review_repo.update(review_id, review_data)
+        # Validate the updated data by creating a temporary Review instance
+        try:
+            temp_review = Review(
+                text=current_data['text'],
+                rating=current_data['rating'],
+                place_id=current_data['place_id'],
+                user_id=current_data['user_id']
+            )
 
-        updated_review = self.review_repo.get(review_id)
+            # If validation passed, update the existing review
+            review.text = temp_review.text
+            review.rating = temp_review.rating
+            review.place_id = temp_review.place_id
+            review.user_id = temp_review.user_id
+            review.updated_at = datetime.now()
 
-        return updated_review
+        except (ValueError, TypeError) as e:
+            # Re-raise validation errors to be caught by API layer
+            raise e
+
+        return review
 
     def delete_review(self, review_id):
         """Delete a review"""
@@ -239,5 +273,4 @@ class HBnBFacade:
                 raise e
         else:
             raise ValueError("Name field is required for amenity update")
-        
         return amenity

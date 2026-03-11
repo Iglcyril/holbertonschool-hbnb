@@ -65,8 +65,10 @@ class ReviewResource(Resource):
             if not updated_review:
                 return {'error': 'Review not found'}, 404
             return updated_review.to_dict(), 200
-        except ValueError as err:
+        except (ValueError, TypeError) as err:
             return {'error': str(err)}, 400
+        except Exception as err:
+            return {'error': 'Internal server error'}, 500
 
     @api.response(200, 'Review deleted successfully')
     @api.response(404, 'Review not found')
