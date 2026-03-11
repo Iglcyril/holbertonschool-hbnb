@@ -75,6 +75,41 @@ class UserResource(Resource):
         """Update user details by ID"""
         try:
             user_data = api.payload
+
+            # Validate first_name
+            if 'first_name' in user_data:
+                first_name = user_data['first_name']
+                if not isinstance(first_name, str) or not first_name.strip():
+                    return {'error': 'First name must be a string and can\'t be empty'}, 400
+                if len(first_name.strip()) > 50:
+                    return {'error': 'First name : 50 charaters max'}, 400
+
+            # Validate last_name
+            if 'last_name' in user_data:
+                last_name = user_data['last_name']
+                if not isinstance(last_name, str) or not last_name.strip():
+                    return {'error': 'Last name must be a string and can\'t be empty'}, 400
+                if len(last_name.strip()) > 50:
+                    return {'error': 'Last name : 50 characters max'}, 400
+
+            # Validate email
+            if 'email' in user_data:
+                email = user_data['email']
+                if not isinstance(email, str) or not email.strip():
+                    return {'error': 'Email can\'t be empty'}, 400
+                if "@" not in email or "." not in email.split("@")[-1]:
+                    return {'error': 'Email adress format not valid'}, 400
+
+                # Check if email is already used by another user
+                existing_user = facade.get_user_by_email(email.strip().lower())
+                if existing_user and existing_user.id != user_id:
+                    return {'error': 'Email already registered'}, 400
+
+            # Validate is_admin
+            if 'is_admin' in user_data:
+                if not isinstance(user_data['is_admin'], bool):
+                    return {'error': 'is_admin must be a boolean value'}, 400
+
             updated_user = facade.update_user(user_id, user_data)
 
             if not updated_user:
@@ -84,7 +119,8 @@ class UserResource(Resource):
                 'id': updated_user.id,
                 'first_name': updated_user.first_name,
                 'last_name': updated_user.last_name,
-                'email': updated_user.email
+                'email': updated_user.email,
+                'is_admin': updated_user.is_admin
             }, 200
         except ValueError as e:
             return {'error': str(e)}, 400
