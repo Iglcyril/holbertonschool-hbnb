@@ -1,10 +1,18 @@
 from .BaseModel import BaseModel
+from app import bcrypt
+from app import db
 
 
-class User(BaseModel):
+class User(BaseModel, db.Model):
     """User model for application users"""
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    password = db.Column(db.String(255), nullable=True)
+    is_admin = db.Column(db.Boolean, default=False)
 
-    def __init__(self, first_name, last_name, email, is_admin=False):
+    """User model for application users"""
+    def __init__(self, first_name, last_name, email, is_admin=False, password=None):
         """Initialize a new User instance
 
         Args:
@@ -37,6 +45,20 @@ class User(BaseModel):
         self.last_name = last_name.strip()
         self.email = email.strip().lower()
         self.is_admin = is_admin
+
+        self.password = None
+        if password:
+            self.hash_password(password)
+
+    def hash_password(self, password):
+        """Hash a password using bcrypt"""
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    def verify_password(self, password):
+        """Verify a password against the stored hash"""
+        if not self.password:
+            return False
+        return bcrypt.check_password_hash(self.password, password)
 
     def __str__(self):
         """String representation of the User object"""
