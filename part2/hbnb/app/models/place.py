@@ -41,6 +41,12 @@ class Place(BaseModel):
         if not isinstance(owner_id, str) or not owner_id.strip():
             raise ValueError("Owner ID must be a non-empty string")
 
+        # Validation de la description
+        if description and not isinstance(description, str):
+            raise ValueError("Description must be a string")
+        if description and len(description.strip()) > 500:
+            raise ValueError("Description must not exceed 500 characters")
+
         self.title = title.strip()
         self.description = description.strip() if description else ""
         self.price = float(price)
@@ -58,6 +64,22 @@ class Place(BaseModel):
         """Add an amenity to the place"""
         if amenity_id not in self.amenity_ids:
             self.amenity_ids.append(amenity_id)
+
+    def update_description(self, new_description):
+        """Update the place description
+        
+        Args:
+            new_description: New description text
+        
+        Raises:
+            ValueError: If description is invalid
+        """
+        if new_description and not isinstance(new_description, str):
+            raise ValueError("Description must be a string")
+        if new_description and len(new_description.strip()) > 500:
+            raise ValueError("Description must not exceed 500 characters")
+        
+        self.description = new_description.strip() if new_description else ""
 
     def __str__(self):
         """String representation of the Place object"""
