@@ -16,18 +16,18 @@ class Review(BaseModel):
         super().__init__()
 
         if not isinstance(text, str) or not text.strip():
-            raise ValueError("Please write a review")
+            raise ValueError("Review text cannot be empty")
 
         if not isinstance(rating, int):
-            raise ValueError("Rating must be an integer.")
+            raise ValueError("Rating must be an integer")
         if rating < 1 or rating > 5:
-            raise ValueError("Rating beetween 0 and 5.")
+            raise ValueError("Rating must be between 1 and 5")
 
         if not isinstance(place_id, str) or not place_id.strip():
-            raise ValueError("Place must be a string.")
+            raise ValueError("Place ID must be a non-empty string")
 
         if not isinstance(user_id, str) or not user_id.strip():
-            raise ValueError("User must be an string")
+            raise ValueError("User ID must be a non-empty string")
 
         self.text = text.strip()
         self.rating = rating

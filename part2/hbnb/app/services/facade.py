@@ -69,12 +69,65 @@ class HBnBFacade:
         return self.place_repo.get_all()
 
     def update_place(self, place_id, place_data):
+        """Update a place with proper validation"""
         place = self.place_repo.get(place_id)
         if not place:
             return None
+
+        # Validate that place_data is not empty
+        if not place_data:
+            raise ValueError("No data provided for update")
+
+        # Create a copy of current place data for validation
+        current_data = {
+            'title': place.title,
+            'description': place.description,
+            'price': place.price,
+            'latitude': place.latitude,
+            'longitude': place.longitude,
+            'owner_id': place.owner_id
+        }
+
+        # Update with new data
         for key, value in place_data.items():
-            if key not in ['id', 'created_at', 'updated_at']:
-                setattr(place, key, value)
+            if key in ['title', 'description', 'price', 'latitude', 'longitude', 'owner_id']:
+                current_data[key] = value
+
+        # Validate the updated data by creating a temporary Place instance
+        try:
+            temp_place = Place(
+                title=current_data['title'],
+                description=current_data['description'], 
+                price=current_data['price'],
+                latitude=current_data['latitude'],
+                longitude=current_data['longitude'],
+                owner_id=current_data['owner_id']
+            )
+
+            # If validation passed, update the existing place
+            place.title = temp_place.title
+            place.description = temp_place.description
+            place.price = temp_place.price
+            place.latitude = temp_place.latitude
+            place.longitude = temp_place.longitude
+            place.owner_id = temp_place.owner_id
+            place.updated_at = datetime.now()
+
+            # Handle amenities if provided
+            if 'amenities' in place_data:
+                amenities = []
+                for amenity_id in place_data['amenities']:
+                    amenity = self.amenity_repo.get(amenity_id)
+                    if amenity:
+                        amenities.append(amenity)
+                    else:
+                        raise ValueError(f"Amenity with ID {amenity_id} not found")
+                place.amenities = amenities
+
+        except (ValueError, TypeError) as e:
+            # Re-raise validation errors to be caught by API layer
+            raise e
+
         return place
     # ===== REVIEW METHODS =====
 
@@ -110,12 +163,30 @@ class HBnBFacade:
 
     def update_review(self, review_id, review_data):
         """Update a review with validation"""
-        from datetime import datetime
+        from app.models.review import Review
 
         review = self.review_repo.get(review_id)
         if not review:
             return None
 
+        # Validate that review_data is not empty
+        if not review_data:
+            raise ValueError("No data provided for update")
+
+        # Create current data with fallbacks
+        current_data = {
+            'text': review.text,
+            'rating': review.rating,
+            'place_id': review.place_id,
+            'user_id': review.user_id
+        }
+
+        # Update with new data
+        for key, value in review_data.items():
+            if key in ['text', 'rating', 'place_id', 'user_id']:
+                current_data[key] = value
+
+        # Validate user_id and place_id exist if being updated
         if 'user_id' in review_data:
             user = self.user_repo.get(review_data['user_id'])
             if not user:
@@ -126,11 +197,27 @@ class HBnBFacade:
             if not place:
                 raise ValueError("Invalid place_id: Place does not exist")
 
-        self.review_repo.update(review_id, review_data)
+        # Validate the updated data by creating a temporary Review instance
+        try:
+            temp_review = Review(
+                text=current_data['text'],
+                rating=current_data['rating'],
+                place_id=current_data['place_id'],
+                user_id=current_data['user_id']
+            )
 
-        updated_review = self.review_repo.get(review_id)
+            # If validation passed, update the existing review
+            review.text = temp_review.text
+            review.rating = temp_review.rating
+            review.place_id = temp_review.place_id
+            review.user_id = temp_review.user_id
+            review.updated_at = datetime.now()
 
-        return updated_review
+        except (ValueError, TypeError) as e:
+            # Re-raise validation errors to be caught by API layer
+            raise e
+
+        return review
 
     def delete_review(self, review_id):
         """Delete a review"""
@@ -169,7 +256,21 @@ class HBnBFacade:
         if not amenity:
             return None
 
+        # Validate that amenity_data is not empty
+        if not amenity_data:
+            raise ValueError("No data provided for update")
+
         if 'name' in amenity_data:
-            amenity.name = amenity_data['name']
-            amenity.updated_at = datetime.now()
+            # Validate the new name using Amenity constructor validation
+            # This will raise ValueError/TypeError if invalid
+            try:
+                temp_amenity = Amenity(name=amenity_data['name'])
+                # If validation passed, update the existing amenity
+                amenity.name = temp_amenity.name  # Use the cleaned name (stripped)
+                amenity.updated_at = datetime.now()
+            except (ValueError, TypeError) as e:
+                # Re-raise the validation error to be caught by API layer
+                raise e
+        else:
+            raise ValueError("Name field is required for amenity update")
         return amenity
