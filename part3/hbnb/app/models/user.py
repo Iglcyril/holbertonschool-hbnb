@@ -5,6 +5,8 @@ from app import db
 
 class User(BaseModel, db.Model):
     """User model for application users"""
+    __tablename__ = 'users'
+
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)

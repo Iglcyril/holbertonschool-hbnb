@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restx import Api
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
@@ -23,6 +23,7 @@ def create_app(config_class="config.DevelopmentConfig"): #ajout de la fonction c
         doc='/' # modification du chemin de la documentation pour éviter les conflits avec les routes de l'API
         )
 
+    from app.models import User, Place, Review, Amenity, place_amenity
     from app.api.v1.users import api as users_ns            # j'ai déplacé car plus logique que ce soit a cette endroit du code, à voir 
     from app.api.v1.amenities import api as amenities_ns
     from app.api.v1.reviews import api as reviews_ns

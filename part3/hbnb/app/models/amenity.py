@@ -1,8 +1,12 @@
 from .BaseModel import BaseModel
+from app import db
 
 
-class Amenity(BaseModel):
+class Amenity(BaseModel, db.Model):
     """Amenity model for place features"""
+    __tablename__ = 'amenities'
+
+    name = db.Column(db.String(50), unique=True, nullable=False)
 
     def __init__(self, name):
         """Initialize a new Amenity instance

@@ -1,4 +1,5 @@
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import get_jwt, jwt_required, get_jwt_identity
 from app.services import facade
 
 api = Namespace('reviews', description='Review operations')
@@ -10,20 +11,41 @@ review_model = api.model('Review', {
         required=True,
         description='Rating of the place (1-5)'
     ),
-    'user_id': fields.String(required=True, description='ID of the user'),
     'place_id': fields.String(required=True, description='ID of the place')
 })
 
 
 @api.route('/')
 class ReviewList(Resource):
+    @jwt_required()
     @api.expect(review_model)
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new review"""
         try:
-            new_review = facade.create_review(api.payload)
+            current_user = get_jwt_identity()
+            data = api.payload
+            place_id = data.get('place_id')
+
+            # Check if place exists
+            place = facade.get_place(place_id)
+            if not place:
+                return {'error': 'Place not found'}, 404
+
+            # Check if user is the owner of the place
+            if place.owner_id == current_user:
+                return {'error': 'You cannot review your own place'}, 400
+
+            # Check if user has already reviewed this place
+            all_reviews = facade.get_all_reviews()
+            for review in all_reviews:
+                if review.user_id == current_user and review.place_id == place_id:
+                    return {'error': 'You have already reviewed this place'}, 400
+
+            # Set user_id to current_user
+            data['user_id'] = current_user
+            new_review = facade.create_review(data)
             return new_review.to_dict(), 201
         except ValueError as err:
             return {'error': str(err)}, 400
@@ -54,13 +76,26 @@ class ReviewResource(Resource):
         except Exception as err:
             return {'error': 'Internal server error'}, 500
 
+    @jwt_required()
     @api.expect(review_model)
     @api.response(200, 'Review updated successfully')
+    @api.response(403, 'You can only update your own review or be an admin')
     @api.response(404, 'Review not found')
     @api.response(400, 'Invalid input data')
     def put(self, review_id):
         """Update a review's information"""
         try:
+            claims = get_jwt()
+            review = facade.get_review(review_id)
+            if not review:
+                return {'error': 'Review not found'}, 404
+
+            is_admin = claims.get('is_admin', False)
+            user_id = claims.get('sub')
+
+            if not is_admin and review.user_id != user_id:
+                return {'error': 'You can only update your own review or be an admin'}, 403
+
             updated_review = facade.update_review(review_id, api.payload)
             if not updated_review:
                 return {'error': 'Review not found'}, 404
@@ -70,14 +105,27 @@ class ReviewResource(Resource):
         except Exception as err:
             return {'error': 'Internal server error'}, 500
 
-    @api.response(200, 'Review deleted successfully')
+    @jwt_required()
+    @api.response(204, 'Review deleted successfully')
+    @api.response(403, 'You can only delete your own review or be an admin')
     @api.response(404, 'Review not found')
     def delete(self, review_id):
         """Delete a review"""
         try:
+            claims = get_jwt()
+            review = facade.get_review(review_id)
+            if not review:
+                return {'error': 'Review not found'}, 404
+
+            is_admin = claims.get('is_admin', False)
+            user_id = claims.get('sub')
+
+            if not is_admin and review.user_id != user_id:
+                return {'error': 'You can only delete your own review or be an admin'}, 403
+
             result = facade.delete_review(review_id)
             if not result:
                 return {'error': 'Review not found'}, 404
-            return {'message': 'Review successfully deleted'}, 200
+            return '', 204
         except Exception as err:
-            return {'error': 'internal server error'}, 500
+            return {'error': 'Internal server error'}, 500

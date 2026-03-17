@@ -1,4 +1,5 @@
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import get_jwt, jwt_required
 from app.services import facade
 
 api = Namespace('users', description='User related operations')
@@ -10,18 +11,30 @@ user_model = api.model('User', {
     'password': fields.String(required=True, description='Password of the user')
 })
 
+user_update_model = api.model('UserUpdate', {
+    'first_name': fields.String(required=False, description='First name of the user'),
+    'last_name': fields.String(required=False, description='Last name of the user'),
+    'email': fields.String(required=False, description='Email (admin only)'),
+    'password': fields.String(required=False, description='Password (admin only)'),
+    'is_admin': fields.Boolean(required=False, description='Admin flag')
+})
+
 
 @api.route('/')
 class UserList(Resource):
+    @jwt_required()
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
-    @api.response(400, 'Invalid input data')
+    @api.response(403, 'Admin privileges required')
     def post(self):
-        """Register a new user"""
+        """Register a new user (admin only)"""
         try:
-            user_data = api.payload
+            claims = get_jwt()
+            if not claims.get('is_admin', False):
+                return {'error': 'Admin privileges required'}, 403
 
+            user_data = api.payload
             existing_user = facade.get_user_by_email(user_data['email'])
             if existing_user:
                 return {'error': 'Email already registered'}, 400
@@ -72,53 +85,36 @@ class UserResource(Resource):
             'email': user.email
             }, 200
 
-    @api.expect(user_model, validate=True)
+    @jwt_required()
+    @api.expect(user_update_model, validate=True)
     @api.response(200, 'User updated successfully')
-    @api.response(400, 'Email already registered')
+    @api.response(403, 'You can only update your own profile or be an admin')
     @api.response(404, 'User not found')
+    @api.response(400, 'You cannot modify email or password')
     def put(self, user_id):
-        """Update user details by ID"""
+        """Update user details"""
         try:
-            user_data = api.payload
+            claims = get_jwt()
+            user_identity = claims.get('sub')
+            is_admin = claims.get('is_admin', False)
 
-            # Validate first_name
-            if 'first_name' in user_data:
-                first_name = user_data['first_name']
-                if not isinstance(first_name, str) or not first_name.strip():
-                    return {'error': 'First name must be a string and can\'t be empty'}, 400
-                if len(first_name.strip()) > 50:
-                    return {'error': 'First name : 50 charaters max'}, 400
+            if not is_admin and user_identity != user_id:
+                return {'error': 'You can only update your own profile or be an admin'}, 403
 
-            # Validate last_name
-            if 'last_name' in user_data:
-                last_name = user_data['last_name']
-                if not isinstance(last_name, str) or not last_name.strip():
-                    return {'error': 'Last name must be a string and can\'t be empty'}, 400
-                if len(last_name.strip()) > 50:
-                    return {'error': 'Last name : 50 characters max'}, 400
-
-            # Validate email
-            if 'email' in user_data:
-                email = user_data['email']
-                if not isinstance(email, str) or not email.strip():
-                    return {'error': 'Email can\'t be empty'}, 400
-                if "@" not in email or "." not in email.split("@")[-1]:
-                    return {'error': 'Email adress format not valid'}, 400
-
-                # Check if email is already used by another user
-                existing_user = facade.get_user_by_email(email.strip().lower())
-                if existing_user and existing_user.id != user_id:
-                    return {'error': 'Email already registered'}, 400
-
-            # Validate is_admin
-            if 'is_admin' in user_data:
-                if not isinstance(user_data['is_admin'], bool):
-                    return {'error': 'is_admin must be a boolean value'}, 400
-
-            updated_user = facade.update_user(user_id, user_data)
-
-            if not updated_user:
+            user = facade.get_user(user_id)
+            if not user:
                 return {'error': 'User not found'}, 404
+
+            user_data = api.payload
+            # Prevent modification of email and password for non-admin users
+            if not is_admin and ('email' in user_data or 'password' in user_data):
+                return {'error': 'You cannot modify email or password'}, 400
+            # Validate email uniqueness when admin modifies email
+            if 'email' in user_data and is_admin:
+                existing_user = facade.get_user_by_email(user_data['email'])
+                if existing_user and existing_user.id != user_id:
+                    return {'error': 'Email already in use'}, 400
+            updated_user = facade.update_user(user_id, user_data)
 
             return {
                 'id': updated_user.id,
@@ -132,13 +128,22 @@ class UserResource(Resource):
         except Exception as e:
             return {'error': 'Internal server error'}, 500
 
+    @jwt_required()
     @api.response(204, 'User deleted successfully')
+    @api.response(403, 'Admin privileges required')
     @api.response(404, 'User not found')
     def delete(self, user_id):
-        """Delete a user by ID"""
-        user = facade.get_user(user_id)
+        """Delete a user (admin only)"""
+        try:
+            claims = get_jwt()
+            if not claims.get('is_admin', False):
+                return {'error': 'Admin privileges required'}, 403
 
-        if not user:
-            return {'error': 'User not found'}, 404
+            user = facade.get_user(user_id)
+            if not user:
+                return {'error': 'User not found'}, 404
 
-        return facade.user_repo.delete(user_id), 204
+            facade.delete_user(user_id)
+            return '', 204
+        except Exception as e:
+            return {'error': 'Internal server error'}, 500

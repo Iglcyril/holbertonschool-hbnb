@@ -1,8 +1,15 @@
 from .BaseModel import BaseModel
+from app import db
 
 
-class Review(BaseModel):
+class Review(BaseModel, db.Model):
     """Review model for place ratings and comments"""
+    __tablename__ = 'reviews'
+    
+    text = db.Column(db.String(1000), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+    place_id = db.Column(db.String(36), nullable=False)
+    user_id = db.Column(db.String(36), nullable=False)
 
     def __init__(self, text, rating, place_id, user_id):
         """Initialize a new Review instance

@@ -1,13 +1,22 @@
 from .BaseModel import BaseModel
+from app import db
 
 
-class Place(BaseModel):
+class Place(BaseModel, db.Model):
     """Place model for rental properties"""
+    __tablename__ = 'places'
+
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(1000), nullable=True)
+    price = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    owner_id = db.Column(db.String(36), nullable=False)
 
     def __init__(
             self, title, price, latitude, longitude, owner_id, description=''):
         """Initialize a new Place instance
-        
+
         Args:
             title: Title of the place
             price: Price per night
@@ -47,17 +56,6 @@ class Place(BaseModel):
         self.latitude = float(latitude)
         self.longitude = float(longitude)
         self.owner_id = owner_id.strip()
-        self.reviews = []
-        self.amenity_ids = []
-
-    def add_review(self, review):
-        """Add a review to the place"""
-        self.reviews.append(review)
-
-    def add_amenity(self, amenity_id):
-        """Add an amenity to the place"""
-        if amenity_id not in self.amenity_ids:
-            self.amenity_ids.append(amenity_id)
 
     def __str__(self):
         """String representation of the Place object"""
@@ -75,6 +73,4 @@ class Place(BaseModel):
             "owner_id": self.owner_id,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
-            "reviews": [r.id if hasattr(r, 'id') else r for r in self.reviews],
-            "amenity_ids": self.amenity_ids
         }

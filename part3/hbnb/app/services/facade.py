@@ -1,30 +1,22 @@
-from app.models.amenity import Amenity
 from app.models.user import User
 from app.models.place import Place
 from app.models.review import Review
-from app.persistence.repository import InMemoryRepository
+from app.models.amenity import Amenity
 from app.persistence.SQLAlchemyRepository import SQLAlchemyRepository
-from app.models.user import User
+from app.persistence.UserRepository import UserRepository
 from datetime import datetime
+from app import db
+
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = SQLAlchemyRepository(User)
+        self.user_repo = UserRepository()
         self.place_repo = SQLAlchemyRepository(Place)
         self.review_repo = SQLAlchemyRepository(Review)
         self.amenity_repo = SQLAlchemyRepository(Amenity)
-        # print("Initialized facade")
     # ===== USER METHODS =====
 
     def create_user(self, user_data):
-        user = User(
-            first_name=user_data['first_name'],
-            last_name=user_data['last_name'],
-            email=user_data['email'],
-        )
-
-        user.hash_password(user_data['password'])
-
         user = User(**user_data)
         self.user_repo.add(user)
         return user
@@ -36,7 +28,7 @@ class HBnBFacade:
         return self.user_repo.get_all()
 
     def get_user_by_email(self, email):
-        return self.user_repo.get_by_attribute('email', email)
+        return self.user_repo.get_user_by_email(email)
 
     def update_user(self, user_id, user_data):
         user = self.user_repo.get(user_id)
@@ -44,29 +36,25 @@ class HBnBFacade:
             return None
         for key, value in user_data.items():
             if key not in ['id', 'created_at', 'updated_at']:
-                setattr(user, key, value)
+                if key == 'password' and value:
+                    user.hash_password(value)
+                else:
+                    setattr(user, key, value)
+        db.session.commit()
         return user
 
+    def delete_user(self, user_id):
+        return self.user_repo.delete(user_id)
     # ===== PLACE METHODS =====
 
     def create_place(self, place_data):
-        amenity_ids = place_data.pop("amenities", [])
-
-        print("USER REPO CONTENT:", self.user_repo.get_all())
-        print("SEARCHING OWNER:", place_data["owner_id"])
-
+        """Create a new place with validation"""
+        # Validate owner exists
         owner = self.user_repo.get(place_data["owner_id"])
         if not owner:
             raise ValueError("Invalid owner_id: User does not exist")
+        
         place = Place(**place_data)
-        place.owner = owner
-        amenities = []
-        for amenity_id in amenity_ids:
-            amenity = self.amenity_repo.get(amenity_id)
-            if not amenity:
-                raise ValueError(f"Amenity {amenity_id} does not exist")
-            amenities.append(amenity)
-        place.amenities = amenities
         self.place_repo.add(place)
         return place
 
@@ -120,23 +108,16 @@ class HBnBFacade:
             place.longitude = temp_place.longitude
             place.owner_id = temp_place.owner_id
             place.updated_at = datetime.now()
-
-            # Handle amenities if provided
-            if 'amenities' in place_data:
-                amenities = []
-                for amenity_id in place_data['amenities']:
-                    amenity = self.amenity_repo.get(amenity_id)
-                    if amenity:
-                        amenities.append(amenity)
-                    else:
-                        raise ValueError(f"Amenity with ID {amenity_id} not found")
-                place.amenities = amenities
+            db.session.commit()
 
         except (ValueError, TypeError) as e:
             # Re-raise validation errors to be caught by API layer
             raise e
 
         return place
+
+    def delete_place(self, place_id):
+        return self.place_repo.delete(place_id)
     # ===== REVIEW METHODS =====
 
     def create_review(self, review_data):
@@ -220,6 +201,7 @@ class HBnBFacade:
             review.place_id = temp_review.place_id
             review.user_id = temp_review.user_id
             review.updated_at = datetime.now()
+            db.session.commit()
 
         except (ValueError, TypeError) as e:
             # Re-raise validation errors to be caught by API layer
@@ -276,9 +258,13 @@ class HBnBFacade:
                 # If validation passed, update the existing amenity
                 amenity.name = temp_amenity.name  # Use the cleaned name (stripped)
                 amenity.updated_at = datetime.now()
+                db.session.commit()
             except (ValueError, TypeError) as e:
                 # Re-raise the validation error to be caught by API layer
                 raise e
         else:
             raise ValueError("Name field is required for amenity update")
         return amenity
+
+    def delete_amenity(self, amenity_id):
+        return self.amenity_repo.delete(amenity_id)

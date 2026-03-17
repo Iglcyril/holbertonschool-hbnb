@@ -1,5 +1,6 @@
 from flask import request
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import get_jwt, jwt_required, get_jwt_identity
 from app.services import facade
 
 api = Namespace('places', description='Place operations')
@@ -23,21 +24,22 @@ place_model = api.model('Place', {
     'description': fields.String(description='Description of the place'),
     'price': fields.Float(required=True, description='Price per night'),
     'latitude': fields.Float(required=True, description='Latitude of the place'),
-    'longitude': fields.Float(required=True, description='Longitude of the place'),
-    'owner_id': fields.String(required=True, description='ID of the owner'),
-    'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
+    'longitude': fields.Float(required=True, description='Longitude of the place')
 })
 
 
 @api.route('/')
 class PlaceList(Resource):
+    @jwt_required()
     @api.expect(place_model)
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new place"""
         try:
+            current_user = get_jwt_identity()
             data = request.get_json()
+            data['owner_id'] = current_user
             new_place = facade.create_place(data)
             return {
                 "id": new_place.id,
@@ -46,8 +48,7 @@ class PlaceList(Resource):
                 "price": new_place.price,
                 "latitude": new_place.latitude,
                 "longitude": new_place.longitude,
-                "owner_id": new_place.owner_id,
-                "amenities": [amenity.id for amenity in new_place.amenities]
+                "owner_id": new_place.owner_id
             }, 201
         except Exception as e:
             return {"message": str(e)}, 400
@@ -63,8 +64,7 @@ class PlaceList(Resource):
             "price": place.price,
             "latitude": place.latitude,
             "longitude": place.longitude,
-            "owner_id": place.owner_id,
-            "amenities": [amenity.id for amenity in place.amenities]
+            "owner_id": place.owner_id
         } for place in places], 200
 
 
@@ -84,27 +84,31 @@ class PlaceResource(Resource):
             "price": place.price,
             "latitude": place.latitude,
             "longitude": place.longitude,
-            "owner": {
-                "id": place.owner.id,
-                "first_name": place.owner.first_name,
-                "last_name": place.owner.last_name,
-                "email": place.owner.email
-            },
-            "amenities": [
-                {
-                    "id": amenity.id,
-                    "name": amenity.name
-                } for amenity in place.amenities
-            ]
+            "owner_id": place.owner_id,
+            "created_at": place.created_at.isoformat(),
+            "updated_at": place.updated_at.isoformat()
         }, 200
 
+    @jwt_required()
     @api.expect(place_model)
     @api.response(200, 'Place updated successfully')
+    @api.response(403, 'You can only update your own place or be an admin')
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
     def put(self, place_id):
         """Update a place's information"""
         try:
+            claims = get_jwt()
+            place = facade.get_place(place_id)
+            if not place:
+                return {"error": "Place not found"}, 404
+            
+            is_admin = claims.get('is_admin', False)
+            user_id = claims.get('sub')
+            
+            if not is_admin and place.owner_id != user_id:
+                return {'error': 'You can only update your own place or be an admin'}, 403
+            
             data = request.get_json()
             updated_place = facade.update_place(place_id, data)
             if not updated_place:
@@ -117,12 +121,34 @@ class PlaceResource(Resource):
                 "latitude": updated_place.latitude,
                 "longitude": updated_place.longitude,
                 "owner_id": updated_place.owner_id,
-                "amenities": [amenity.id for amenity in updated_place.amenities],
                 "created_at": updated_place.created_at.isoformat(),
                 "updated_at": updated_place.updated_at.isoformat()
             }, 200
         except (ValueError, TypeError) as e:
             return {"error": str(e)}, 400
+        except Exception as e:
+            return {"error": "Internal server error"}, 500
+
+    @jwt_required()
+    @api.response(204, 'Place deleted successfully')
+    @api.response(403, 'You can only delete your own place or be an admin')
+    @api.response(404, 'Place not found')
+    def delete(self, place_id):
+        """Delete a place"""
+        try:
+            claims = get_jwt()
+            place = facade.get_place(place_id)
+            if not place:
+                return {"error": "Place not found"}, 404
+            
+            is_admin = claims.get('is_admin', False)
+            user_id = claims.get('sub')
+            
+            if not is_admin and place.owner_id != user_id:
+                return {'error': 'You can only delete your own place or be an admin'}, 403
+            
+            facade.delete_place(place_id)
+            return '', 204
         except Exception as e:
             return {"error": "Internal server error"}, 500
 
