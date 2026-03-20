@@ -1,11 +1,35 @@
-from .BaseModel import BaseModel
+from app import db
+from app.models.BaseModel import BaseModel
+
+
+# Association table for Many-to-Many relationship between Place and Amenity
+place_amenity = db.Table(
+    'place_amenity',
+    db.Column('place_id', db.String(36), db.ForeignKey('places.id'), primary_key=True),
+    db.Column('amenity_id', db.String(36), db.ForeignKey('amenities.id'), primary_key=True)
+)
 
 
 class Place(BaseModel):
-    """Place model for rental properties"""
+    """Place model for rental properties (SQLAlchemy mapped)"""
+    
+    __tablename__ = 'places'
+    
+    # SQLAlchemy columns
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(500))
+    price = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    
+    # Relationships
+    owner = db.relationship('User', backref='places', lazy=True)
+    reviews = db.relationship('Review', backref='place', lazy=True, cascade='all, delete-orphan')
+    amenities = db.relationship('Amenity', secondary=place_amenity, lazy='subquery',
+                                backref=db.backref('places', lazy=True))
 
-    def __init__(
-            self, title, price, latitude, longitude, owner_id, description=''):
+    def __init__(self, title, price, latitude, longitude, owner_id, description=''):
         """Initialize a new Place instance
         
         Args:
@@ -16,8 +40,7 @@ class Place(BaseModel):
             owner_id: ID of the place owner
             description: Optional description of the place
         """
-        super().__init__()
-
+        # Validations
         if not isinstance(title, str) or not title.strip():
             raise ValueError("Title must be a non-empty string")
         if len(title.strip()) > 100:
@@ -41,23 +64,36 @@ class Place(BaseModel):
         if not isinstance(owner_id, str) or not owner_id.strip():
             raise ValueError("Owner ID must be a non-empty string")
 
+        if description and not isinstance(description, str):
+            raise ValueError("Description must be a string")
+        if description and len(description.strip()) > 500:
+            raise ValueError("Description must not exceed 500 characters")
+
+        # Set attributes
         self.title = title.strip()
         self.description = description.strip() if description else ""
         self.price = float(price)
         self.latitude = float(latitude)
         self.longitude = float(longitude)
         self.owner_id = owner_id.strip()
-        self.reviews = []
-        self.amenity_ids = []
 
-    def add_review(self, review):
-        """Add a review to the place"""
-        self.reviews.append(review)
+    def add_amenity(self, amenity):
+        """Add an amenity to the place
+        
+        Args:
+            amenity: Amenity object to add
+        """
+        if amenity not in self.amenities:
+            self.amenities.append(amenity)
 
-    def add_amenity(self, amenity_id):
-        """Add an amenity to the place"""
-        if amenity_id not in self.amenity_ids:
-            self.amenity_ids.append(amenity_id)
+    def remove_amenity(self, amenity):
+        """Remove an amenity from the place
+        
+        Args:
+            amenity: Amenity object to remove
+        """
+        if amenity in self.amenities:
+            self.amenities.remove(amenity)
 
     def __str__(self):
         """String representation of the Place object"""
@@ -74,7 +110,5 @@ class Place(BaseModel):
             "longitude": self.longitude,
             "owner_id": self.owner_id,
             "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat(),
-            "reviews": [r.id if hasattr(r, 'id') else r for r in self.reviews],
-            "amenity_ids": self.amenity_ids
+            "updated_at": self.updated_at.isoformat()
         }

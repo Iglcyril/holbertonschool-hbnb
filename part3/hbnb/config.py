@@ -1,15 +1,17 @@
 import os
 
+
 class Config:
     """Base configuation class"""
     SECRET_KEY = os.getenv('SECRET_KEY', 'default_secret_key')
     DEBUG = False
 
+
 class DevelopmentConfig(Config):
     """Developpement environnement configuration"""
     DEBUG = True
-    SQLALCHMEY_DATABSE_URI = 'sqlite:///developpement.db'
-    SQLALCHMEY_DATABSE_URI = False
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///developpement.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 config = {
     'development': DevelopmentConfig,

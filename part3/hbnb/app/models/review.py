@@ -1,8 +1,24 @@
-from .BaseModel import BaseModel
+from app import db
+from app.models.BaseModel import BaseModel
 
 
 class Review(BaseModel):
-    """Review model for place ratings and comments"""
+    """Review model for place ratings and comments (SQLAlchemy mapped)"""
+    
+    __tablename__ = 'reviews'
+    
+
+    text = db.Column(db.String(1000), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+    place_id = db.Column(db.String(36), db.ForeignKey('places.id'), nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    
+
+    user = db.relationship('User', backref='reviews', lazy=True)
+    
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'place_id', name='unique_user_place_review'),
+    )
 
     def __init__(self, text, rating, place_id, user_id):
         """Initialize a new Review instance
@@ -13,7 +29,6 @@ class Review(BaseModel):
             place_id: ID of the place being reviewed
             user_id: ID of the user who wrote the review
         """
-        super().__init__()
 
         if not isinstance(text, str) or not text.strip():
             raise ValueError("Review text cannot be empty")
