@@ -77,12 +77,38 @@ function displayPlaces(places) {
         card.dataset.price = place.price;
         card.innerHTML = `
             <div class="card-image"></div>
-            <h2>${place.title}</h2>
-            <p class="price">$${place.price} / night</p>
-            <p>${place.description || ''}</p>
-            <a href="place.html?id=${place.id}" class="details-button">View Details</a>
+            <div class="card-content">
+                <h2>${place.title}</h2>
+                <p class="price">$${place.price} / night</p>
+                <p class="description">${place.description || ''}</p>
+                <a href="place.html?id=${place.id}" class="details-button">View Details</a>
+            </div>
         `;
+        card.classList.add('hidden');
         placesList.appendChild(card);
+    });
+
+    observeCards();
+}
+
+/* === FADE-IN OBSERVER === */
+
+/**
+ * Use IntersectionObserver to trigger fade-in animation on place cards
+ */
+function observeCards() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.remove('hidden');
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.place-card.hidden').forEach(card => {
+        observer.observe(card);
     });
 }
 
