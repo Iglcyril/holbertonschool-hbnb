@@ -115,3 +115,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+/* === LOGIN PAGE REDIRECT === */
+
+/**
+ * If user is already authenticated and visits login page,
+ * redirect them to index page
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    const isLoginPage = document.getElementById('login-form') !== null;
+
+    if (isLoginPage && isAuthenticated()) {
+        window.location.href = 'index.html';
+    }
+});
