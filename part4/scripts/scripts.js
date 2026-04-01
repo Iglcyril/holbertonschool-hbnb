@@ -67,3 +67,51 @@ function updateNavigation() {
 
 // Run on every page load
 document.addEventListener('DOMContentLoaded', updateNavigation);
+
+/* === LOGIN === */
+
+/**
+ * Send login request to API
+ */
+async function loginUser(email, password) {
+    const response = await fetch('http://localhost:5000/api/v1/auth/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+    });
+    return response;
+}
+
+/**
+ * Handle login form submission
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('login-form');
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMessage = document.getElementById('error-message');
+
+            try {
+                const response = await loginUser(email, password);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setCookie('token', data.access_token, 7);
+                    window.location.href = 'index.html';
+                } else {
+                    const error = await response.json();
+                    errorMessage.textContent = error.message || 'Login failed. Please check your credentials.';
+                }
+            } catch (err) {
+                errorMessage.textContent = 'Connection error. Please try again.';
+            }
+        });
+    }
+});
