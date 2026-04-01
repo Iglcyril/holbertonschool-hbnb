@@ -78,32 +78,83 @@ function displayPlaceDetails(place) {
 /* === ADD REVIEW ACCESS === */
 
 /**
+ * Decode JWT token to get user ID
+ */
+function getUserIdFromToken(token) {
+    try {
+        const payload = token.split('.')[1];
+        const decoded = JSON.parse(atob(payload));
+        return decoded.sub;
+    } catch (err) {
+        return null;
+    }
+}
+
+/**
  * Show or hide add review section based on authentication
- * and add link to add_review.html with place ID
+ * Attaches form submit handler to post review inline via API
  */
 function checkAuthForReview(token, placeId) {
     const addReviewSection = document.getElementById('add-review');
 
     if (!addReviewSection) return;
 
-    if (token) {
-        addReviewSection.style.display = 'block';
+    if (!token) {
+        addReviewSection.style.display = 'none';
+        return;
+    }
 
-        // Update form action to include place ID
-        const reviewForm = document.getElementById('review-form');
-        if (reviewForm) {
-            reviewForm.dataset.placeId = placeId;
+    addReviewSection.style.display = 'block';
+
+    const reviewForm = document.getElementById('review-form');
+    if (!reviewForm) return;
+
+    reviewForm.dataset.placeId = placeId;
+
+    reviewForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const reviewText = document.getElementById('review-text').value.trim();
+        const rating = document.getElementById('rating').value;
+        const successMessage = document.getElementById('review-success');
+        const errorMessage = document.getElementById('review-error');
+
+        successMessage.textContent = '';
+        errorMessage.textContent = '';
+
+        if (!reviewText) {
+            errorMessage.textContent = 'Please enter a review.';
+            return;
         }
 
-        // Add link to add_review page
-        const addReviewLink = document.createElement('a');
-        addReviewLink.href = `add_review.html?id=${placeId}`;
-        addReviewLink.className = 'details-button';
-        addReviewLink.textContent = 'Write a Review';
-        addReviewSection.appendChild(addReviewLink);
-    } else {
-        addReviewSection.style.display = 'none';
-    }
+        try {
+            const response = await fetch(`${API_URL}/reviews/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    text: reviewText,
+                    rating: parseInt(rating),
+                    place_id: placeId,
+                    user_id: getUserIdFromToken(token)
+                })
+            });
+
+            if (response.ok) {
+                successMessage.textContent = 'Review submitted successfully!';
+                reviewForm.reset();
+                // Refresh place details (reviews list) without full reload
+                await fetchPlaceDetails(token, placeId);
+            } else {
+                const data = await response.json().catch(() => ({}));
+                errorMessage.textContent = data.error || 'Failed to submit review. Please try again.';
+            }
+        } catch (err) {
+            errorMessage.textContent = 'Connection error. Please try again.';
+        }
+    });
 }
 
 /**
