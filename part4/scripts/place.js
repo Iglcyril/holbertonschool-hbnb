@@ -1,7 +1,7 @@
 /* === PLACE DETAILS PAGE === */
-
+ 
 const API_URL = 'http://localhost:5000/api/v1';
-
+ 
 /**
  * Extract place ID from URL query parameters
  */
@@ -9,7 +9,7 @@ function getPlaceIdFromURL() {
     const params = new URLSearchParams(window.location.search);
     return params.get('id');
 }
-
+ 
 /**
  * Fetch place details from API
  */
@@ -19,13 +19,13 @@ async function fetchPlaceDetails(token, placeId) {
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
         }
-
+ 
         const response = await fetch(`${API_URL}/places/${placeId}`, { headers });
-
+ 
         if (!response.ok) {
             throw new Error('Place not found');
         }
-
+ 
         const place = await response.json();
         displayPlaceDetails(place);
     } catch (err) {
@@ -35,14 +35,14 @@ async function fetchPlaceDetails(token, placeId) {
         }
     }
 }
-
+ 
 /**
  * Display place details dynamically
  */
 function displayPlaceDetails(place) {
     const placeDetails = document.getElementById('place-details');
     if (!placeDetails) return;
-
+ 
     placeDetails.innerHTML = `
         <h1>${place.title}</h1>
         <div class="place-info">
@@ -53,7 +53,7 @@ function displayPlaceDetails(place) {
         </div>
         <p class="description">${place.description || ''}</p>
     `;
-
+ 
     // Display reviews
     const reviewsList = document.getElementById('reviews-list');
     if (reviewsList) {
@@ -64,7 +64,7 @@ function displayPlaceDetails(place) {
                 card.className = 'review-card';
                 card.innerHTML = `
                     <p class="rating">${'⭐'.repeat(review.rating)}</p>
-                    <p class="author">By: ${review.user_id}</p>
+                    <p class="author">By: ${review.user_name || 'Anonymous'}</p>
                     <p>${review.text}</p>
                 `;
                 reviewsList.appendChild(card);
@@ -74,9 +74,9 @@ function displayPlaceDetails(place) {
         }
     }
 }
-
+ 
 /* === ADD REVIEW ACCESS === */
-
+ 
 /**
  * Decode JWT token to get user ID
  */
@@ -89,44 +89,44 @@ function getUserIdFromToken(token) {
         return null;
     }
 }
-
+ 
 /**
  * Show or hide add review section based on authentication
  * Attaches form submit handler to post review inline via API
  */
 function checkAuthForReview(token, placeId) {
     const addReviewSection = document.getElementById('add-review');
-
+ 
     if (!addReviewSection) return;
-
+ 
     if (!token) {
         addReviewSection.style.display = 'none';
         return;
     }
-
+ 
     addReviewSection.style.display = 'block';
-
+ 
     const reviewForm = document.getElementById('review-form');
     if (!reviewForm) return;
-
+ 
     reviewForm.dataset.placeId = placeId;
-
+ 
     reviewForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-
+ 
         const reviewText = document.getElementById('review-text').value.trim();
         const rating = document.getElementById('rating').value;
         const successMessage = document.getElementById('review-success');
         const errorMessage = document.getElementById('review-error');
-
+ 
         successMessage.textContent = '';
         errorMessage.textContent = '';
-
+ 
         if (!reviewText) {
             errorMessage.textContent = 'Please enter a review.';
             return;
         }
-
+ 
         try {
             const response = await fetch(`${API_URL}/reviews/`, {
                 method: 'POST',
@@ -141,7 +141,7 @@ function checkAuthForReview(token, placeId) {
                     user_id: getUserIdFromToken(token)
                 })
             });
-
+ 
             if (response.ok) {
                 successMessage.textContent = 'Review submitted successfully!';
                 reviewForm.reset();
@@ -156,19 +156,20 @@ function checkAuthForReview(token, placeId) {
         }
     });
 }
-
+ 
 /**
  * Initialize place details page
  */
 document.addEventListener('DOMContentLoaded', () => {
     const placeId = getPlaceIdFromURL();
     const token = getCookie('token');
-
+ 
     if (!placeId) {
         window.location.href = 'index.html';
         return;
     }
-
+ 
     fetchPlaceDetails(token, placeId);
     checkAuthForReview(token, placeId);
 });
+ 
