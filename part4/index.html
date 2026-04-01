@@ -18,19 +18,22 @@
         </div>
     </header>
 
+    <section class="hero">
+        <h1 class="hero-title">Where every journey<br>finds its home</h1>
+        <p class="hero-subtitle">Discover unique places to stay around the world</p>
+        <div class="hero-search">
+            <select id="price-filter">
+                <option value="all">All prices</option>
+                <option value="10">Max $10 / night</option>
+                <option value="50">Max $50 / night</option>
+                <option value="100">Max $100 / night</option>
+            </select>
+            <button class="search-btn">Search</button>
+        </div>
+    </section>
+
     <main class="main-container">
         <section class="filters">
-            <h1>Where every journey finds its home</h1>
-            <p class="hero-subtitle">Discover unique places to stay around the world</p>
-            <div class="filter-group">
-                <label for="price-filter">Max price per night :</label>
-                <select id="price-filter">
-                    <option value="all">All</option>
-                    <option value="10">$10</option>
-                    <option value="50">$50</option>
-                    <option value="100">$100</option>
-                </select>
-            </div>
         </section>
         <section id="places-list" class="places-list">
             <!-- Places will be dynamically inserted here -->
@@ -38,6 +41,7 @@
     </main>
 
     <footer>
+        <img src="images/logo.png" alt="HBnB Logo" class="footer-logo">
         <p>&copy; 2024 HBnB. All rights reserved.</p>
     </footer>
 

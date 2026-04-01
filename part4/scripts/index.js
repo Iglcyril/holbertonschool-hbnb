@@ -76,7 +76,10 @@ function displayPlaces(places) {
         card.className = 'place-card';
         card.dataset.price = place.price;
         card.innerHTML = `
-            <div class="card-image"></div>
+            <div class="card-image">
+                <span class="card-badge">New</span>
+                <span class="price-badge">$${place.price} / night</span>
+            </div>
             <div class="card-content">
                 <h2>${place.title}</h2>
                 <p class="price">$${place.price} / night</p>
