@@ -1,5 +1,5 @@
 /* === GOOGLE FONT IMPORT === */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gilda+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
 
 /* === CSS VARIABLES === */
 :root {
@@ -178,7 +178,52 @@ main {
     padding: 48px 32px;
 }
 
-/* === HERO / FILTERS SECTION === */
+/* === HERO SECTION === */
+.hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(135deg, #f5f0eb, #e8e0d5);
+    padding: 0 24px;
+}
+
+.hero-title {
+    font-family: 'Gilda Display', serif;
+    font-size: 72px;
+    font-weight: 400;
+    line-height: 1.1;
+    color: #1a1a1a;
+}
+
+.hero-subtitle {
+    font-size: 20px;
+    color: #888888;
+    margin-top: 16px;
+}
+
+.hero-btn {
+    display: inline-block;
+    margin-top: 32px;
+    padding: 14px 32px;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero-btn:hover {
+    background-color: #333333;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(26, 26, 26, 0.25);
+}
+
+/* === FILTERS / SEARCH BAR === */
 .filters {
     text-align: center;
     margin-bottom: 56px;
@@ -197,8 +242,7 @@ main {
     color: var(--accent);
 }
 
-.filters > p,
-.hero-subtitle {
+.filters > p {
     font-size: 1.05rem;
     color: var(--text-light);
     margin-bottom: 36px;
@@ -239,6 +283,28 @@ select#price-filter {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 28px;
+    padding-top: 60px;
+}
+
+/* === FADE-IN ANIMATION === */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.place-card.hidden {
+    opacity: 0;
+    transform: translateY(24px);
+}
+
+.place-card.visible {
+    animation: fadeInUp 0.5s ease forwards;
 }
 
 /* === PLACE CARD === */
