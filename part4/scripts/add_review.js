@@ -119,3 +119,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+/* === HANDLE RESPONSE === */
+
+/**
+ * Handle API response after review submission
+ */
+async function handleResponse(response, form) {
+    const successMessage = document.getElementById('success-message');
+    const errorMessage = document.getElementById('error-message');
+
+    // Reset messages
+    successMessage.textContent = '';
+    errorMessage.textContent = '';
+
+    if (response.ok) {
+        successMessage.textContent = 'Review submitted successfully!';
+        form.reset();
+
+        // Redirect to place page after 2 seconds
+        const placeId = getPlaceIdFromURL();
+        setTimeout(() => {
+            window.location.href = `place.html?id=${placeId}`;
+        }, 2000);
+    } else {
+        try {
+            const data = await response.json();
+            errorMessage.textContent = data.error || 'Failed to submit review. Please try again.';
+        } catch {
+            errorMessage.textContent = 'Failed to submit review. Please try again.';
+        }
+    }
+}
