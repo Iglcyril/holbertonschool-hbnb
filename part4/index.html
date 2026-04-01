@@ -18,7 +18,22 @@
         </div>
     </header>
 
-    <main>
+    <main class="main-container">
+        <section class="filters">
+            <h1>Find your perfect place</h1>
+            <div class="filter-group">
+                <label for="price-filter">Max price per night :</label>
+                <select id="price-filter">
+                    <option value="all">All</option>
+                    <option value="10">$10</option>
+                    <option value="50">$50</option>
+                    <option value="100">$100</option>
+                </select>
+            </div>
+        </section>
+        <section id="places-list" class="places-list">
+            <!-- Places will be dynamically inserted here -->
+        </section>
     </main>
 
     <footer>
