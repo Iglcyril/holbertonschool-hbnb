@@ -75,6 +75,37 @@ function displayPlaceDetails(place) {
     }
 }
 
+/* === ADD REVIEW ACCESS === */
+
+/**
+ * Show or hide add review section based on authentication
+ * and add link to add_review.html with place ID
+ */
+function checkAuthForReview(token, placeId) {
+    const addReviewSection = document.getElementById('add-review');
+
+    if (!addReviewSection) return;
+
+    if (token) {
+        addReviewSection.style.display = 'block';
+
+        // Update form action to include place ID
+        const reviewForm = document.getElementById('review-form');
+        if (reviewForm) {
+            reviewForm.dataset.placeId = placeId;
+        }
+
+        // Add link to add_review page
+        const addReviewLink = document.createElement('a');
+        addReviewLink.href = `add_review.html?id=${placeId}`;
+        addReviewLink.className = 'details-button';
+        addReviewLink.textContent = 'Write a Review';
+        addReviewSection.appendChild(addReviewLink);
+    } else {
+        addReviewSection.style.display = 'none';
+    }
+}
+
 /**
  * Initialize place details page
  */
@@ -88,4 +119,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     fetchPlaceDetails(token, placeId);
+    checkAuthForReview(token, placeId);
 });
