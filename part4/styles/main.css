@@ -428,69 +428,54 @@ select#price-filter:focus {
     min-height: 20px;
 }
 
-/* === RESPONSIVE === */
+/* === RESPONSIVE MOBILE === */
 @media (max-width: 768px) {
-    header {
-        height: auto;
-        padding: 12px 0;
-    }
 
+    /* Header */
     .header-container {
         flex-direction: column;
         gap: 12px;
-        padding: 0 16px;
+        padding: 12px 20px;
     }
 
-    header nav {
+    nav {
+        display: flex;
+        gap: 12px;
+    }
+
+    /* Index */
+    .filters {
         flex-direction: column;
-        gap: 8px;
-        width: 100%;
-        text-align: center;
-    }
-
-    .login-button,
-    .details-button {
-        width: 100%;
-        text-align: center;
-    }
-
-    main {
-        padding: 16px;
-    }
-
-    .login-container {
-        padding: 20px 16px;
-        min-height: calc(100vh - 60px);
-    }
-
-    .login-box {
-        padding: 24px 20px;
-    }
-
-    .place-card,
-    .review-card {
-        margin: 10px 0;
+        align-items: flex-start;
     }
 
     .places-list {
         grid-template-columns: 1fr;
     }
 
-    .filters {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .filters h1 {
-        font-size: 1.4rem;
-    }
-
+    /* Place details */
     .place-info {
         grid-template-columns: 1fr;
     }
 
-    .place-details,
-    .add-review {
-        padding: 20px;
+    /* Login */
+    .login-box {
+        padding: 24px 16px;
+    }
+
+    /* Add review */
+    .form-buttons {
+        flex-direction: column;
+    }
+
+    /* Cards */
+    .place-card,
+    .review-card {
+        margin: 10px 0;
+    }
+
+    /* Main container */
+    .main-container {
+        padding: 16px 12px;
     }
 }
