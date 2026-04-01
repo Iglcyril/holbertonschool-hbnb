@@ -222,6 +222,101 @@ select#price-filter:focus {
     margin-top: 12px;
 }
 
+/* === PLACE PAGE === */
+.place-details {
+    background-color: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.place-details h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.place-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.place-info span {
+    background-color: var(--background);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.reviews-section {
+    margin-bottom: 30px;
+}
+
+.reviews-section h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.review-card {
+    background-color: var(--white);
+    border: 1px solid var(--gray);
+    border-radius: var(--radius);
+    margin: var(--margin-card);
+    padding: var(--padding-card);
+    box-shadow: var(--shadow);
+}
+
+.review-card .rating {
+    color: var(--primary);
+    font-size: 20px;
+    margin-bottom: 6px;
+}
+
+.review-card .author {
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.add-review {
+    background-color: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 30px;
+}
+
+.add-review h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    border: 1px solid var(--gray);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(255, 90, 95, 0.15);
+}
+
 /* === LOGIN PAGE === */
 .login-container {
     display: flex;
@@ -353,5 +448,14 @@ select#price-filter:focus {
 
     .filters h1 {
         font-size: 1.4rem;
+    }
+
+    .place-info {
+        grid-template-columns: 1fr;
+    }
+
+    .place-details,
+    .add-review {
+        padding: 20px;
     }
 }
