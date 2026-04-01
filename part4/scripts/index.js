@@ -84,3 +84,43 @@ function displayPlaces(places) {
         placesList.appendChild(card);
     });
 }
+
+/* === PRICE FILTER === */
+
+/**
+ * Filter places by maximum price
+ * @param {string} maxPrice - selected price value or 'all'
+ */
+function filterPlacesByPrice(maxPrice) {
+    const cards = document.querySelectorAll('.place-card');
+
+    cards.forEach(card => {
+        const price = parseFloat(card.dataset.price);
+
+        if (maxPrice === 'all') {
+            card.style.display = 'block';
+        } else {
+            if (price <= parseFloat(maxPrice)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        }
+    });
+
+    // Show message if no places match filter
+    const placesList = document.getElementById('places-list');
+    const visibleCards = document.querySelectorAll('.place-card[style="display: block;"]');
+    const noResults = document.getElementById('no-results');
+
+    if (visibleCards.length === 0) {
+        if (!noResults) {
+            const msg = document.createElement('p');
+            msg.id = 'no-results';
+            msg.textContent = 'No places match your filter.';
+            placesList.appendChild(msg);
+        }
+    } else {
+        if (noResults) noResults.remove();
+    }
+}
