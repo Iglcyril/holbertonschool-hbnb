@@ -54,3 +54,68 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+/* === SUBMIT REVIEW === */
+
+/**
+ * Send review data to API
+ */
+async function submitReview(token, placeId, reviewText, rating) {
+    const response = await fetch(`${API_URL}/reviews/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            text: reviewText,
+            rating: parseInt(rating),
+            place_id: placeId,
+            user_id: getUserIdFromToken(token)
+        })
+    });
+    return response;
+}
+
+/**
+ * Decode JWT token to get user ID
+ */
+function getUserIdFromToken(token) {
+    try {
+        const payload = token.split('.')[1];
+        const decoded = JSON.parse(atob(payload));
+        return decoded.sub;
+    } catch (err) {
+        return null;
+    }
+}
+
+/**
+ * Setup review form event listener
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    const reviewForm = document.getElementById('review-form');
+    const token = checkAuthentication();
+    const placeId = getPlaceIdFromURL();
+
+    if (!reviewForm || !token || !placeId) return;
+
+    reviewForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const reviewText = document.getElementById('review-text').value.trim();
+        const rating = document.getElementById('rating').value;
+
+        if (!reviewText) {
+            document.getElementById('error-message').textContent = 'Please enter a review.';
+            return;
+        }
+
+        try {
+            const response = await submitReview(token, placeId, reviewText, rating);
+            handleResponse(response, reviewForm);
+        } catch (err) {
+            document.getElementById('error-message').textContent = 'Connection error. Please try again.';
+        }
+    });
+});
