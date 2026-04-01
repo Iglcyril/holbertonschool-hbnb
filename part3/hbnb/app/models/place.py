@@ -22,6 +22,7 @@ class Place(BaseModel):
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    image_url = db.Column(db.String(500), nullable=True)
     
     # Relationships
     owner = db.relationship('User', backref='places', lazy=True)
@@ -29,7 +30,7 @@ class Place(BaseModel):
     amenities = db.relationship('Amenity', secondary=place_amenity, lazy='subquery',
                                 backref=db.backref('places', lazy=True))
 
-    def __init__(self, title, price, latitude, longitude, owner_id, description=''):
+    def __init__(self, title, price, latitude, longitude, owner_id, description='', image_url=None):
         """Initialize a new Place instance
         
         Args:
@@ -76,6 +77,7 @@ class Place(BaseModel):
         self.latitude = float(latitude)
         self.longitude = float(longitude)
         self.owner_id = owner_id.strip()
+        self.image_url = image_url
 
     def add_amenity(self, amenity):
         """Add an amenity to the place
@@ -109,6 +111,7 @@ class Place(BaseModel):
             "latitude": self.latitude,
             "longitude": self.longitude,
             "owner_id": self.owner_id,
+            "image_url": self.image_url,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat()
         }
