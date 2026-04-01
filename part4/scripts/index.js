@@ -79,10 +79,13 @@ function displayPlaces(places) {
             <div class="card-image">
                 <span class="card-badge">New</span>
                 <span class="price-badge">$${place.price} / night</span>
+                <button class="favorite-btn">❤️</button>
             </div>
             <div class="card-content">
                 <h2>${place.title}</h2>
-                <p class="price">$${place.price} / night</p>
+                <div class="card-meta">
+                    <span class="card-reviews">⭐ ${place.reviews ? place.reviews.length : 0} reviews</span>
+                </div>
                 <p class="description">${place.description || ''}</p>
                 <a href="place.html?id=${place.id}" class="details-button">View Details</a>
             </div>

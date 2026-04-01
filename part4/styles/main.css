@@ -367,7 +367,7 @@ select#price-filter {
     padding: 0;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
 }
@@ -380,8 +380,8 @@ select#price-filter {
 }
 
 .place-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
 }
 
 /* Image placeholder at top of card */
@@ -428,6 +428,45 @@ select#price-filter {
     padding: 6px 12px;
     border-radius: 20px;
     z-index: 1;
+}
+
+.favorite-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 1;
+}
+
+.card-image:hover .favorite-btn {
+    display: flex;
+}
+
+.favorite-btn:hover {
+    background-color: var(--white);
+    transform: scale(1.1);
+}
+
+.card-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0;
+}
+
+.card-reviews {
+    font-size: 14px;
+    color: #888888;
 }
 
 /* Card body */
