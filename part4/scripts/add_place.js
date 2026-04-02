@@ -130,7 +130,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             const response = await submitPlace(currentToken, placeData);
 
             if (response.ok) {
-                await response.json().catch(() => ({}));
+                const data = await response.json().catch(() => ({}));
+
+                // Send additional images
+                const imageUrls = [
+                    document.getElementById('image_url_2').value.trim(),
+                    document.getElementById('image_url_3').value.trim(),
+                    document.getElementById('image_url_4').value.trim()
+                ].filter(url => url !== '');
+
+                for (const url of imageUrls) {
+                    await fetch(`${API_URL}/places/${data.id}/images`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${currentToken}`
+                        },
+                        body: JSON.stringify({ image_url: url, is_primary: false })
+                    });
+                }
+
                 successMessage.textContent = 'Place created successfully!';
                 window.location.replace('http://localhost:5500/part4/index.html');
             } else {
