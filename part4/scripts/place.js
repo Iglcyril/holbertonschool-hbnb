@@ -43,16 +43,6 @@ function displayPlaceDetails(place) {
     const placeDetails = document.getElementById('place-details');
     if (!placeDetails) return;
 
-    // Hero background image
-    const placeHero = document.querySelector('.place-hero');
-    if (placeHero) {
-        if (place.image_url) {
-            placeHero.style.backgroundImage = `url('${place.image_url}')`;
-            placeHero.style.backgroundSize = 'cover';
-            placeHero.style.backgroundPosition = 'center';
-        }
-    }
-
     // Amenities badges
     const amenitiesHTML = place.amenities.length > 0
         ? place.amenities.map(a => `<span class="amenity-badge">${a.name}</span>`).join('')
@@ -100,7 +90,97 @@ function displayPlaceDetails(place) {
     }
 
     initMap(place.latitude, place.longitude, place.title);
-    initLightbox(place.image_url);
+}
+
+/* === GALLERY === */
+
+/**
+ * Fetch all images for a place and display the gallery
+ */
+async function loadPlaceImages(placeId, token) {
+    try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const response = await fetch(`${API_URL}/places/${placeId}/images`, { headers });
+        const images = await response.json();
+        displayGallery(images);
+    } catch (err) {
+        console.error('Failed to load images:', err);
+    }
+}
+
+/**
+ * Attach lightbox close/backdrop/escape controls (called once after gallery loads)
+ */
+function initLightboxControls() {
+    const lightbox = document.getElementById('lightbox');
+    const closeBtn = document.querySelector('.lightbox-close');
+
+    if (!lightbox) return;
+
+    closeBtn.addEventListener('click', () => {
+        lightbox.classList.remove('active');
+    });
+
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) {
+            lightbox.classList.remove('active');
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            lightbox.classList.remove('active');
+        }
+    });
+}
+
+/**
+ * Render gallery grid in the hero — primary image large, up to 3 thumbs aside
+ */
+function displayGallery(images) {
+    const hero = document.querySelector('.place-hero');
+    if (!hero || images.length === 0) return;
+
+    // Sort: primary first
+    images.sort((a, b) => b.is_primary - a.is_primary);
+
+    const primary = images[0];
+    const secondary = images.slice(1, 4);
+
+    // Fill missing slots with placeholder
+    while (secondary.length < 3) {
+        secondary.push({ image_url: null });
+    }
+
+    hero.innerHTML = `
+        <div class="gallery-grid">
+            <div class="gallery-main">
+                <img src="${primary.image_url}" alt="Main photo">
+            </div>
+            <div class="gallery-secondary">
+                ${secondary.map(img => `
+                    <div class="gallery-thumb">
+                        ${img.image_url
+                            ? `<img src="${img.image_url}" alt="Photo">`
+                            : `<div class="gallery-placeholder">🏠</div>`
+                        }
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    // Lightbox on each image click
+    hero.querySelectorAll('img').forEach(img => {
+        img.addEventListener('click', () => {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = img.src;
+            lightbox.classList.add('active');
+        });
+    });
 }
 
 /* === MAP === */
@@ -255,6 +335,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
  
     fetchPlaceDetails(token, placeId);
+    loadPlaceImages(placeId, token);
+    initLightboxControls();
     checkAuthForReview(token, placeId);
 });
  
