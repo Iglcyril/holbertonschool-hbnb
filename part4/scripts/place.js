@@ -100,6 +100,7 @@ function displayPlaceDetails(place) {
     }
 
     initMap(place.latitude, place.longitude, place.title);
+    initLightbox(place.image_url);
 }
 
 /* === MAP === */
@@ -118,6 +119,45 @@ function initMap(latitude, longitude, title) {
         .addTo(map)
         .bindPopup(`<b>${title}</b>`)
         .openPopup();
+}
+
+/* === LIGHTBOX === */
+
+/**
+ * Initialize lightbox on hero image click
+ */
+function initLightbox(imageUrl) {
+    if (!imageUrl) return;
+
+    const hero = document.querySelector('.place-hero');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const closeBtn = document.querySelector('.lightbox-close');
+
+    if (!hero || !lightbox) return;
+
+    lightboxImg.src = imageUrl;
+
+    hero.addEventListener('click', () => {
+        lightbox.classList.add('active');
+    });
+
+    closeBtn.addEventListener('click', () => {
+        lightbox.classList.remove('active');
+    });
+
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) {
+            lightbox.classList.remove('active');
+        }
+    });
+
+    // Close with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            lightbox.classList.remove('active');
+        }
+    });
 }
 
 /* === ADD REVIEW ACCESS === */
