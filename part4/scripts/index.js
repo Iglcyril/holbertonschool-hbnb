@@ -75,8 +75,12 @@ function displayPlaces(places) {
         const card = document.createElement('div');
         card.className = 'place-card';
         card.dataset.price = place.price;
+        const imageStyle = place.image_url
+            ? `background-image: url('${place.image_url}'); background-size: cover; background-position: center;`
+            : `background: linear-gradient(135deg, #e8e0d5, #d4c5b0);`;
+
         card.innerHTML = `
-            <div class="card-image">
+            <div class="card-image" style="${imageStyle}">
                 <span class="card-badge">New</span>
                 <span class="price-badge">$${place.price} / night</span>
                 <button class="favorite-btn">❤️</button>
@@ -90,32 +94,32 @@ function displayPlaces(places) {
                 <a href="place.html?id=${place.id}" class="details-button">View Details</a>
             </div>
         `;
-        card.classList.add('hidden');
         placesList.appendChild(card);
     });
 
-    observeCards();
+    animateCards();
 }
 
 /* === FADE-IN OBSERVER === */
 
 /**
- * Use IntersectionObserver to trigger fade-in animation on place cards
+ * Animate cards on scroll using IntersectionObserver
  */
-function observeCards() {
+function animateCards() {
+    const cards = document.querySelectorAll('.place-card');
+
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry, index) => {
             if (entry.isIntersecting) {
-                entry.target.classList.remove('hidden');
-                entry.target.classList.add('visible');
+                setTimeout(() => {
+                    entry.target.classList.add('visible');
+                }, index * 100);
                 observer.unobserve(entry.target);
             }
         });
     }, { threshold: 0.1 });
 
-    document.querySelectorAll('.place-card.hidden').forEach(card => {
-        observer.observe(card);
-    });
+    cards.forEach(card => observer.observe(card));
 }
 
 /* === PRICE FILTER === */

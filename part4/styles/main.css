@@ -381,15 +381,6 @@ select#price-filter {
     }
 }
 
-.place-card.hidden {
-    opacity: 0;
-    transform: translateY(24px);
-}
-
-.place-card.visible {
-    animation: fadeInUp 0.5s ease forwards;
-}
-
 /* === PLACE CARD === */
 .place-card {
     background-color: #fafafa;
@@ -399,9 +390,16 @@ select#price-filter {
     padding: 0;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.place-card.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .card-content {
@@ -411,7 +409,7 @@ select#price-filter {
     flex: 1;
 }
 
-.place-card:hover {
+.place-card.visible:hover {
     transform: translateY(-6px);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
 }
