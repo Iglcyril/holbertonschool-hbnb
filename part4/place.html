@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HBnB - Place</title>
     <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
@@ -32,7 +32,7 @@
         <div class="place-container">
             <!-- Left column -->
             <div class="place-left">
-                <section id="place-details" class="place-details"></section>
+                <div id="place-details" class="place-details"></div>
                 <section id="reviews" class="reviews-section">
                     <h2 class="reviews-title">Reviews</h2>
                     <div id="reviews-list"></div>
@@ -47,6 +47,7 @@
                         <div class="form-group">
                             <label for="rating">Rating</label>
                             <select id="rating" required>
+                                <option value="">-- Select a rating --</option>
                                 <option value="1">⭐ 1 - Poor</option>
                                 <option value="2">⭐⭐ 2 - Fair</option>
                                 <option value="3">⭐⭐⭐ 3 - Good</option>
@@ -79,7 +80,7 @@
 
     <div id="lightbox" class="lightbox">
         <span class="lightbox-close">✕</span>
-        <img id="lightbox-img" src="" alt="Place image">
+        <img id="lightbox-img" src="#" alt="Place image">
     </div>
 
     <script src="scripts/scripts.js"></script>
