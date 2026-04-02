@@ -26,6 +26,18 @@ document.addEventListener('DOMContentLoaded', () => {
             filterPlacesByPrice(event.target.value);
         });
     }
+
+    // Search button scrolls to places list
+    const searchBtn = document.querySelector('.search-btn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+            const maxPrice = priceFilter ? priceFilter.value : 'all';
+            filterPlacesByPrice(maxPrice);
+            const section = document.querySelector('.top-rated-section');
+            const offset = section.getBoundingClientRect().top + window.scrollY - 220;
+            window.scrollTo({ top: offset, behavior: 'smooth' });
+        });
+    }
 });
 
 /* === FETCH PLACES === */
@@ -49,6 +61,7 @@ async function fetchPlaces(token) {
         const places = await response.json();
         allPlaces = places;
         displayPlaces(places);
+        displayTopRated(places);
     } catch (err) {
         const placesList = document.getElementById('places-list');
         if (placesList) {
@@ -160,4 +173,58 @@ function filterPlacesByPrice(maxPrice) {
     } else {
         if (noResults) noResults.remove();
     }
+}
+
+/* === TOP RATED === */
+
+/**
+ * Display the top rated place
+ */
+async function displayTopRated(places) {
+    const topRatedContainer = document.getElementById('top-rated-place');
+    if (!topRatedContainer) return;
+
+    // Fetch reviews for each place and calculate average rating
+    const placesWithRatings = await Promise.all(places.map(async (place) => {
+        try {
+            const response = await fetch(`${API_URL}/places/${place.id}`);
+            const data = await response.json();
+            const reviews = data.reviews || [];
+            const avgRating = reviews.length > 0
+                ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+                : 0;
+            return { ...place, avgRating, reviewCount: reviews.length };
+        } catch {
+            return { ...place, avgRating: 0, reviewCount: 0 };
+        }
+    }));
+
+    // Find place with highest rating
+    const topPlace = placesWithRatings
+        .filter(p => p.reviewCount > 0)
+        .sort((a, b) => b.avgRating - a.avgRating)[0];
+
+    if (!topPlace) {
+        topRatedContainer.innerHTML = '<p class="no-top-rated">No rated places yet.</p>';
+        return;
+    }
+
+    const imageStyle = topPlace.image_url
+        ? `background-image: url('${topPlace.image_url}'); background-size: cover; background-position: center;`
+        : `background: linear-gradient(135deg, #e8e0d5, #d4c5b0);`;
+
+    topRatedContainer.innerHTML = `
+        <div class="top-rated-card">
+            <div class="top-rated-image" style="${imageStyle}">
+                <span class="top-rated-badge">⭐ ${topPlace.avgRating.toFixed(1)} / 5</span>
+            </div>
+            <div class="top-rated-content">
+                <h3>${topPlace.title}</h3>
+                <p class="top-rated-desc">${topPlace.description || ''}</p>
+                <p class="top-rated-price">$${topPlace.price} / night</p>
+                <p class="top-rated-reviews">${topPlace.reviewCount} review${topPlace.reviewCount > 1 ? 's' : ''}</p>
+                <a href="place.html?id=${topPlace.id}" class="details-button">View Details</a>
+            </div>
+        </div>
+    `;
 }
