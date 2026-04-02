@@ -558,68 +558,187 @@ select#price-filter {
 }
 
 /* === PLACE DETAILS PAGE === */
+.place-main {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.place-hero {
+    width: 100%;
+    height: 420px;
+    background: linear-gradient(135deg, #e8e0d5, #d4c5b0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.place-hero-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.place-hero-icon {
+    font-size: 80px;
+    opacity: 0.4;
+}
+
+.place-container {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 48px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+}
+
+.place-left {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
 .place-details {
-    background-color: #F6F7EE;
-    border: 1px solid #e0d9d0;
-    border-radius: var(--radius);
-    padding: 40px;
-    margin-bottom: 32px;
-    box-shadow: var(--shadow-sm);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin-bottom: 0;
+    box-shadow: none;
 }
 
 .place-details h1,
 #place-details h1 {
     font-family: 'Gilda Display', serif;
-    font-size: 48px;
+    font-size: 42px;
     font-weight: 400;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
     line-height: 1.2;
+}
+
+.place-details .place-host,
+#place-details .place-host {
+    font-size: 18px;
+    color: #888888;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e0d9d0;
+}
+
+.place-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 24px 0;
+}
+
+.place-info span {
+    background-color: #F6F7EE;
+    border: 1px solid #e0d9d0;
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-medium);
 }
 
 .place-details .description {
     font-size: 1rem;
     color: var(--text-medium);
     line-height: 1.8;
-    margin-top: 20px;
 }
 
-.place-info {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin: 20px 0;
+.amenities-section h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--primary);
 }
 
-.place-info span {
-    background-color: var(--background);
-    border: 1px solid var(--gray);
-    padding: 10px 16px;
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text-medium);
+.amenity-badge {
+    background-color: #1a1a1a;
+    color: var(--white);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 13px;
+    display: inline-block;
+    margin: 4px;
+}
+
+/* Right sticky column */
+.place-right {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+}
+
+.price-card {
+    background-color: var(--white);
+    border: 1px solid #e0d9d0;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.price-card .big-price {
+    font-family: 'Gilda Display', serif;
+    font-size: 36px;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    font-weight: 400;
+}
+
+.price-card .big-price span {
+    font-size: 16px;
+    color: #888888;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+}
+
+.back-btn {
+    display: block;
+    text-align: center;
+    margin-top: 16px;
+    color: #888888;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s ease;
+}
+
+.back-btn:hover {
+    color: #1a1a1a;
+}
+
+.place-map {
+    height: 220px;
+    border-radius: 16px;
+    margin-top: 16px;
+    border: 1px solid #e0d9d0;
+    overflow: hidden;
 }
 
 /* === REVIEWS SECTION === */
 .reviews-section {
-    margin-bottom: 32px;
+    margin-bottom: 0;
 }
 
-.reviews-section h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: -0.3px;
-    margin-bottom: 20px;
+.reviews-title {
+    font-family: 'Gilda Display', serif;
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 24px;
     color: var(--primary);
 }
 
 .review-card {
-    background-color: #F6F7EE;
+    background-color: var(--white);
     border: 1px solid #e0d9d0;
-    border-radius: var(--radius);
+    border-radius: 12px;
     margin: 0 0 16px 0;
-    padding: 20px 24px;
-    box-shadow: var(--shadow-sm);
+    padding: 20px;
     transition: box-shadow 0.2s ease;
 }
 
@@ -630,13 +749,12 @@ select#price-filter {
 .review-card .rating {
     font-size: 18px;
     margin-bottom: 8px;
-    color: var(--accent);
 }
 
 .review-card .author {
-    font-weight: 700;
+    font-weight: 600;
     font-size: 0.9rem;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     color: var(--primary);
 }
 
@@ -649,12 +767,20 @@ select#price-filter {
 /* === ADD REVIEW SECTION === */
 .add-review {
     background-color: var(--white);
-    border: 1px solid var(--gray);
-    border-radius: var(--radius);
-    padding: 36px 40px;
-    max-width: 600px;
-    margin: 0 auto;
-    box-shadow: var(--shadow-sm);
+    border: 1px solid #e0d9d0;
+    border-radius: 16px;
+    padding: 28px;
+    max-width: none;
+    margin: 0;
+    box-shadow: none;
+}
+
+.add-review h2 {
+    font-family: 'Gilda Display', serif;
+    font-size: 24px;
+    font-weight: 400;
+    margin-bottom: 20px;
+    color: var(--primary);
 }
 
 .add-review h1,
@@ -883,8 +1009,28 @@ select#price-filter {
     }
 
     /* Place details */
+    .place-container {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        padding: 0 16px 40px;
+    }
+
+    .place-right {
+        position: static;
+    }
+
+    .place-hero {
+        height: 240px;
+        margin-bottom: 24px;
+    }
+
     .place-details {
-        padding: 24px 20px;
+        padding: 0;
+    }
+
+    #place-details h1,
+    .place-details h1 {
+        font-size: 28px;
     }
 
     .place-details h1 {

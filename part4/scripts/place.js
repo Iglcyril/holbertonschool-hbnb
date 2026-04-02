@@ -42,19 +42,44 @@ async function fetchPlaceDetails(token, placeId) {
 function displayPlaceDetails(place) {
     const placeDetails = document.getElementById('place-details');
     if (!placeDetails) return;
- 
+
+    // Hero background image
+    const placeHero = document.querySelector('.place-hero');
+    if (placeHero) {
+        if (place.image_url) {
+            placeHero.style.backgroundImage = `url('${place.image_url}')`;
+            placeHero.style.backgroundSize = 'cover';
+            placeHero.style.backgroundPosition = 'center';
+        }
+    }
+
+    // Amenities badges
+    const amenitiesHTML = place.amenities.length > 0
+        ? place.amenities.map(a => `<span class="amenity-badge">${a.name}</span>`).join('')
+        : '<span class="amenity-badge">No amenities listed</span>';
+
     placeDetails.innerHTML = `
         <h1>${place.title}</h1>
+        <p class="place-host">Hosted by ${place.owner.first_name} ${place.owner.last_name}</p>
         <div class="place-info">
-            <span>🏠 Host: ${place.owner.first_name} ${place.owner.last_name}</span>
-            <span>💰 Price: $${place.price} / night</span>
-            <span>📍 Location: ${place.latitude}, ${place.longitude}</span>
-            <span>⭐ Amenities: ${place.amenities.map(a => a.name).join(', ') || 'None'}</span>
+            <span>📍 ${place.latitude}, ${place.longitude}</span>
         </div>
         <p class="description">${place.description || ''}</p>
+        <div class="amenities-section">
+            <h3>Amenities</h3>
+            <div class="amenities-list">${amenitiesHTML}</div>
+        </div>
     `;
- 
-    // Display reviews
+
+    // Price card
+    const priceDisplay = document.getElementById('price-display');
+    if (priceDisplay) {
+        priceDisplay.innerHTML = `
+            <p class="big-price">$${place.price}<span> / night</span></p>
+        `;
+    }
+
+    // Reviews
     const reviewsList = document.getElementById('reviews-list');
     if (reviewsList) {
         if (place.reviews && place.reviews.length > 0) {
@@ -70,11 +95,31 @@ function displayPlaceDetails(place) {
                 reviewsList.appendChild(card);
             });
         } else {
-            reviewsList.innerHTML = '<p>No reviews yet.</p>';
+            reviewsList.innerHTML = '<p>No reviews yet. Be the first!</p>';
         }
     }
+
+    initMap(place.latitude, place.longitude, place.title);
 }
- 
+
+/* === MAP === */
+
+/**
+ * Initialize Leaflet map centered on the place coordinates
+ */
+function initMap(latitude, longitude, title) {
+    const map = L.map('map').setView([latitude, longitude], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    L.marker([latitude, longitude])
+        .addTo(map)
+        .bindPopup(`<b>${title}</b>`)
+        .openPopup();
+}
+
 /* === ADD REVIEW ACCESS === */
  
 /**
