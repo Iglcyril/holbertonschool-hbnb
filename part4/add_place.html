@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBnB - Add Place</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <img src="images/logo.png" alt="HBnB Logo" class="logo">
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="login.html" class="login-button" id="login-link">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <section class="add-place-container">
+            <h1>Add a New Place</h1>
+            <p class="subtitle">Share your space with the world</p>
+            <form id="add-place-form" class="form">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" placeholder="Ex: Cozy Studio Paris" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="4" placeholder="Describe your place..." required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="price">Price per night ($)</label>
+                        <input type="number" id="price" name="price" min="1" placeholder="Ex: 85" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="latitude">Latitude</label>
+                        <input type="number" id="latitude" name="latitude" step="any" placeholder="Ex: 48.8566" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="longitude">Longitude</label>
+                        <input type="number" id="longitude" name="longitude" step="any" placeholder="Ex: 2.3522" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="image_url">Main Image URL</label>
+                    <input type="url" id="image_url" name="image_url" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>Amenities</label>
+                    <div id="amenities-list" class="amenities-checkboxes">
+                        <!-- Amenities will be loaded dynamically -->
+                    </div>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="details-button">Create Place</button>
+                    <a href="index.html" class="cancel-button">Cancel</a>
+                </div>
+                <p id="success-message" class="success-message"></p>
+                <p id="error-message" class="error-message"></p>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <img src="images/logo.png" alt="HBnB Logo" class="footer-logo">
+        <p>&copy; 2024 HBnB. All rights reserved.</p>
+    </footer>
+
+    <script src="scripts/scripts.js"></script>
+    <script src="scripts/add_place.js"></script>
+</body>
+</html>
