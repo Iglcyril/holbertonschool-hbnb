@@ -22,13 +22,14 @@ class Place(BaseModel):
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
-    image_url = db.Column(db.String(500), nullable=True)
+    image_url = db.Column(db.String(500), nullable=False)
     
     # Relationships
     owner = db.relationship('User', backref='places', lazy=True)
     reviews = db.relationship('Review', backref='place', lazy=True, cascade='all, delete-orphan')
     amenities = db.relationship('Amenity', secondary=place_amenity, lazy='subquery',
                                 backref=db.backref('places', lazy=True))
+    images = db.relationship('PlaceImage', backref='place', lazy=True, cascade='all, delete-orphan')
 
     def __init__(self, title, price, latitude, longitude, owner_id, description='', image_url=None):
         """Initialize a new Place instance

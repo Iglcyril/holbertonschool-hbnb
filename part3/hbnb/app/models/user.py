@@ -13,9 +13,11 @@ class User(BaseModel):
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password = db.Column(db.String(255), nullable=True)
     is_admin = db.Column(db.Boolean, default=False)
+    bio = db.Column(db.String(500), nullable=True)
+    profile_picture_url = db.Column(db.String(500), nullable=True)
     
 
-    def __init__(self, first_name, last_name, email, is_admin=False, password=None):
+    def __init__(self, first_name, last_name, email, is_admin=False, password=None, bio=None, profile_picture_url=None):
         """Initialize a new User instance
 
         Args:
@@ -47,6 +49,8 @@ class User(BaseModel):
         self.last_name = last_name.strip()
         self.email = email.strip().lower()
         self.is_admin = is_admin
+        self.bio = bio
+        self.profile_picture_url = profile_picture_url
 
         self.password = None
         if password:
@@ -74,6 +78,8 @@ class User(BaseModel):
             "last_name": self.last_name,
             "email": self.email,
             "is_admin": self.is_admin,
+            "bio": self.bio,
+            "profile_picture_url": self.profile_picture_url,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
         }
