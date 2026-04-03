@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBnB - My Account</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <img src="images/logo.png" alt="HBnB Logo" class="logo">
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="account.html" class="login-button" id="account-link" style="display:none;">Account</a>
+                <a href="login.html" class="login-button" id="login-link">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <section class="account-container">
+
+            <div class="account-header">
+                <div class="account-avatar" id="account-avatar">
+                    <img id="account-avatar-img" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:50%;">
+                    <span id="account-avatar-initials"></span>
+                </div>
+                <div>
+                    <h1 id="account-fullname">Loading...</h1>
+                    <p id="account-email" class="account-email"></p>
+                </div>
+            </div>
+
+            <div class="account-grid">
+
+                <!-- User info card -->
+                <div class="account-card">
+                    <h2 class="account-card-title">Personal Information</h2>
+                    <div class="account-info-list">
+                        <div class="account-info-item">
+                            <span class="account-info-label">First name</span>
+                            <span class="account-info-value" id="info-firstname">—</span>
+                        </div>
+                        <div class="account-info-item">
+                            <span class="account-info-label">Last name</span>
+                            <span class="account-info-value" id="info-lastname">—</span>
+                        </div>
+                        <div class="account-info-item">
+                            <span class="account-info-label">Email</span>
+                            <span class="account-info-value" id="info-email">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats card -->
+                <div class="account-card">
+                    <h2 class="account-card-title">My Activity</h2>
+                    <div class="account-stats">
+                        <div class="account-stat">
+                            <span class="account-stat-number" id="stat-places">—</span>
+                            <span class="account-stat-label">Places listed</span>
+                        </div>
+                        <div class="account-stat">
+                            <span class="account-stat-number" id="stat-reviews">—</span>
+                            <span class="account-stat-label">Reviews written</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Profile edit card -->
+            <div class="account-card">
+                <h2 class="account-card-title">My Profile</h2>
+                <form id="profile-form" class="profile-form">
+                    <div class="form-group">
+                        <label for="profile-picture">Profile Photo URL</label>
+                        <input type="text" id="profile-picture" name="profile_picture_url" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label for="bio">About me</label>
+                        <textarea id="bio" name="bio" rows="4" placeholder="Tell us a bit about yourself..."></textarea>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="details-button">Save</button>
+                    </div>
+                    <p id="profile-success" class="success-message"></p>
+                    <p id="profile-error" class="error-message"></p>
+                </form>
+            </div>
+
+            <!-- My places -->
+            <div class="account-places-section">
+                <h2 class="account-card-title">My Places</h2>
+                <div id="account-places" class="account-places-grid"></div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer>
+        <img src="images/logo.png" alt="HBnB Logo" class="footer-logo">
+        <p>&copy; 2026 HBnB. All rights reserved.</p>
+    </footer>
+
+    <script src="scripts/scripts.js"></script>
+    <script src="scripts/account.js"></script>
+</body>
+</html>

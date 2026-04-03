@@ -15,6 +15,7 @@
             <img src="images/logo.png" alt="HBnB Logo" class="logo">
             <nav>
                 <a href="index.html">Home</a>
+                <a href="account.html" class="login-button" id="account-link" style="display:none;">Account</a>
                 <a href="login.html" class="login-button" id="login-link">Login</a>
             </nav>
         </div>
@@ -64,19 +65,62 @@
 
             <!-- Right column -->
             <div class="place-right">
-                <div class="price-card">
-                    <div id="price-display"></div>
-                    <a href="index.html" class="back-btn">← Back to listings</a>
+                <div class="place-right-main">
+                    <div class="price-card">
+                        <div id="price-display"></div>
+                        <div class="booking-form">
+                            <div class="booking-dates">
+                                <div class="booking-field">
+                                    <label for="checkin">Check-in</label>
+                                    <input type="date" id="checkin">
+                                </div>
+                                <div class="booking-field">
+                                    <label for="checkout">Check-out</label>
+                                    <input type="date" id="checkout">
+                                </div>
+                            </div>
+                            <div id="booking-total" class="booking-total" style="display:none;">
+                                <span id="nights-count"></span>
+                                <span id="total-price"></span>
+                            </div>
+                            <button id="book-btn" class="details-button booking-btn" style="display:none;">Reserve</button>
+                        </div>
+                        <a href="index.html" class="back-btn">← Back to listings</a>
+                    </div>
+                    <div id="map" class="place-map"></div>
                 </div>
-                <div id="map" class="place-map"></div>
+                <div class="host-cards-column">
+                    <div id="host-card" class="host-card" style="display:none;">
+                        <h3 class="host-card-title">Your Host</h3>
+                        <div class="host-card-profile">
+                            <div class="host-avatar" id="host-avatar"></div>
+                            <div>
+                                <p class="host-name" id="host-name"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="host-bio-card" class="host-card" style="display:none;">
+                        <h3 class="host-card-title">About the Host</h3>
+                        <p class="host-bio" id="host-bio"></p>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 
     <footer>
         <img src="images/logo.png" alt="HBnB Logo" class="footer-logo">
-        <p>&copy; 2024 HBnB. All rights reserved.</p>
+        <p>&copy; 2026 HBnB. All rights reserved.</p>
     </footer>
+
+    <div id="booking-modal" class="booking-modal">
+        <div class="booking-modal-box">
+            <img src="images/logo.png" alt="HBnB Logo" class="booking-modal-logo">
+            <h2>Booking Confirmed!</h2>
+            <p>Thank you for your booking! You will receive a payment link at your email address.</p>
+            <button id="booking-modal-close" class="details-button">Close</button>
+        </div>
+    </div>
 
     <div id="lightbox" class="lightbox">
         <span class="lightbox-close">✕</span>

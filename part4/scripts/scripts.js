@@ -44,12 +44,26 @@ function isAuthenticated() {
 function updateNavigation() {
     const loginLink = document.getElementById('login-link');
 
+    const accountLink = document.getElementById('account-link');
+
     if (isAuthenticated()) {
         if (loginLink) loginLink.style.display = 'none';
+        if (accountLink) accountLink.style.display = 'inline-block';
+
+        const nav = document.querySelector('nav');
+
+        // Add "Add Place" link if not already present
+        if (!document.getElementById('add-place-link')) {
+            const addPlaceLink = document.createElement('a');
+            addPlaceLink.id = 'add-place-link';
+            addPlaceLink.href = 'add_place.html';
+            addPlaceLink.textContent = '+ Add Place';
+            addPlaceLink.className = 'login-button';
+            nav.insertBefore(addPlaceLink, accountLink);
+        }
 
         // Add logout button if not already present
         if (!document.getElementById('logout-btn')) {
-            const nav = document.querySelector('nav');
             const logoutBtn = document.createElement('button');
             logoutBtn.id = 'logout-btn';
             logoutBtn.textContent = 'Logout';
@@ -62,6 +76,7 @@ function updateNavigation() {
         }
     } else {
         if (loginLink) loginLink.style.display = 'block';
+        if (accountLink) accountLink.style.display = 'none';
     }
 }
 

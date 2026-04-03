@@ -67,6 +67,7 @@ function displayPlaceDetails(place) {
         priceDisplay.innerHTML = `
             <p class="big-price">$${place.price}<span> / night</span></p>
         `;
+        initBooking(place.price);
     }
 
     // Reviews
@@ -87,6 +88,27 @@ function displayPlaceDetails(place) {
         } else {
             reviewsList.innerHTML = '<p>No reviews yet. Be the first!</p>';
         }
+    }
+
+    // Host card
+    const hostCard = document.getElementById('host-card');
+    if (hostCard && place.owner) {
+        const hostAvatar = document.getElementById('host-avatar');
+        const owner = place.owner;
+
+        if (owner.profile_picture_url) {
+            hostAvatar.innerHTML = `<img src="${owner.profile_picture_url}" alt="${owner.first_name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        } else {
+            hostAvatar.textContent = `${owner.first_name.charAt(0)}${owner.last_name.charAt(0)}`.toUpperCase();
+        }
+
+        document.getElementById('host-name').textContent = `${owner.first_name} ${owner.last_name}`;
+        hostCard.style.display = 'block';
+
+        const hostBioCard = document.getElementById('host-bio-card');
+        const hostBio = document.getElementById('host-bio');
+        hostBio.textContent = owner.bio || 'This host has not written a description yet.';
+        hostBioCard.style.display = 'block';
     }
 
     initMap(place.latitude, place.longitude, place.title);
@@ -322,18 +344,78 @@ function checkAuthForReview(token, placeId) {
     });
 }
  
+/* === BOOKING === */
+
+/**
+ * Initialize booking calendar with real-time price calculation
+ */
+function initBooking(pricePerNight) {
+    const checkin = document.getElementById('checkin');
+    const checkout = document.getElementById('checkout');
+    const bookingTotal = document.getElementById('booking-total');
+    const nightsCount = document.getElementById('nights-count');
+    const totalPrice = document.getElementById('total-price');
+    const bookBtn = document.getElementById('book-btn');
+
+    // Set min date to today
+    const today = new Date().toISOString().split('T')[0];
+    checkin.min = today;
+    checkout.min = today;
+
+    function updateTotal() {
+        const inDate = new Date(checkin.value);
+        const outDate = new Date(checkout.value);
+
+        if (!checkin.value || !checkout.value || outDate <= inDate) {
+            bookingTotal.style.display = 'none';
+            bookBtn.style.display = 'none';
+            return;
+        }
+
+        const nights = Math.round((outDate - inDate) / (1000 * 60 * 60 * 24));
+        const total = nights * pricePerNight;
+
+        nightsCount.textContent = `${nights} night${nights > 1 ? 's' : ''}`;
+        totalPrice.textContent = `Total: $${total}`;
+        bookingTotal.style.display = 'flex';
+        bookBtn.style.display = 'block';
+    }
+
+    checkin.addEventListener('change', () => {
+        if (checkin.value) checkout.min = checkin.value;
+        updateTotal();
+    });
+
+    checkout.addEventListener('change', updateTotal);
+
+    bookBtn.addEventListener('click', () => {
+        const modal = document.getElementById('booking-modal');
+        modal.classList.add('active');
+    });
+
+    document.getElementById('booking-modal-close').addEventListener('click', () => {
+        document.getElementById('booking-modal').classList.remove('active');
+    });
+
+    document.getElementById('booking-modal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('booking-modal')) {
+            document.getElementById('booking-modal').classList.remove('active');
+        }
+    });
+}
+
 /**
  * Initialize place details page
  */
 document.addEventListener('DOMContentLoaded', () => {
     const placeId = getPlaceIdFromURL();
     const token = getCookie('token');
- 
+
     if (!placeId) {
         window.location.href = 'index.html';
         return;
     }
- 
+
     fetchPlaceDetails(token, placeId);
     loadPlaceImages(placeId, token);
     initLightboxControls();

@@ -136,7 +136,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const imageUrls = [
                     document.getElementById('image_url_2').value.trim(),
                     document.getElementById('image_url_3').value.trim(),
-                    document.getElementById('image_url_4').value.trim()
+                    document.getElementById('image_url_4').value.trim(),
+                    document.getElementById('image_url_5').value.trim()
                 ].filter(url => url !== '');
 
                 for (const url of imageUrls) {
